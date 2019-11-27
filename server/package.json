@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "node dist/api/index.js",
-    "watch": "nodemon --watch '**/*.ts' --exec 'ts-node' index.ts",
+    "watch": "nodemon --watch \"**/*.ts\" --exec \"ts-node\" index.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "build": "tsc -p src/api"
   },
@@ -36,8 +36,6 @@
     "@types/cors": "^2.8.6",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.2",
-    "@types/jasmine": "~3.5.0",
-    "@types/jasminewd2": "~2.0.3",
     "@types/lodash": "^4.14.104",
     "@types/node": "^12.12.14",
     "@types/pump": "^1.0.1",
@@ -50,11 +48,6 @@
     "concurrently": "^5.0.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
-    "karma": "~4.4.1",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage-istanbul-reporter": "~2.1.1",
-    "karma-jasmine": "~2.0.1",
-    "karma-jasmine-html-reporter": "^1.4.0",
     "lodash": "^4.17.15",
     "mkdirp": "^0.5.1",
     "node-sass": "^4.11.0",
@@ -62,9 +55,9 @@
     "protractor": "~5.4.0",
     "socket.io-client": "^2.3.0",
     "stats.js": "^0.17.0",
-    "ts-node": "^8.0.2",
+    "ts-node": "^8.5.2",
     "tsify": "^4.0.1",
     "tslint": "~5.20.1",
-    "typescript": "^3.5.3"
+    "typescript": "^3.7.2"
   }
 }
