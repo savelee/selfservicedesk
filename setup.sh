@@ -66,10 +66,14 @@ gcloud iam service-accounts keys create ../master.json \
 GOOGLE_APPLICATION_CREDENTIALS=../master.json
 ACCESS_TOKEN="$(gcloud auth application-default print-access-token)"
 
-#bold "Zipping Intents..."
-#zip -r dialogflow/agent/agent.zip dialogflow/agent
-#bold "Uploading Intents to $GCLOUD_STORAGE_BUCKET_NAME..."
-#gsutil cp dialogflow/agent/agent.zip gs://$GCLOUD_STORAGE_BUCKET_NAME/
+bold "Creating Storage bucket..."
+gsutil mb gs://$GCLOUD_STORAGE_BUCKET_NAME/
+
+bold "Zipping Intents..."
+zip -r dialogflow/airportagent/agent.zip dialogflow/airportagent
+
+bold "Uploading Intents to $GCLOUD_STORAGE_BUCKET_NAME..."
+gsutil cp dialogflow/agent/agent.zip gs://$GCLOUD_STORAGE_BUCKET_NAME/
 
 bold "Create a Dialogflow Agent..."
 echo $ACCESS_TOKEN
@@ -79,14 +83,13 @@ curl -H "Content-Type: application/json; charset=utf-8"  \
 -H "Authorization: Bearer $ACCESS_TOKEN" \
 -d $JSONPROD "https://dialogflow.googleapis.com/v2/projects/$PROJECT_ID/agent"
 
-#IMPORTFILES="{\"agentUri\":\"gs://$GCLOUD_STORAGE_BUCKET_NAME/agent.zip\"}"
-#bold "Import Intents to Prod"
-#curl -X POST \
-#-H "Authorization: Bearer $ACCESS_TOKEN" \
-#-H "Content-Type: application/json; charset=utf-8" \
-#-d $IMPORTFILES \
-#https://dialogflow.googleapis.com/v2/projects/$PROJECT_ID/agent:import
+IMPORTFILES="{\"agentUri\":\"gs://$GCLOUD_STORAGE_BUCKET_NAME/agent.zip\"}"
 
-## WHEN YOU WANT TO RUN THE DEMO ONLY LOCALLY, YOU CAN COMMENT OUT THE GKE PART BELOW HERE
+bold "Import Intents to Prod"
+curl -X POST \
+-H "Authorization: Bearer $ACCESS_TOKEN" \
+-H "Content-Type: application/json; charset=utf-8" \
+-d $IMPORTFILES \
+https://dialogflow.googleapis.com/v2/projects/$PROJECT_ID/agent:import
 
 bold "Setup & Deployment complete!"
