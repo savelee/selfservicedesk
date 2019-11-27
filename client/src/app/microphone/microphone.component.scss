@@ -1,0 +1,21 @@
+.card.highlight-card {
+    background-color: #ef6c00;
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 10px;
+    text-decoration: none;
+  }
+.card.highlight-card svg {
+    fill: white;
+    position: relative;
+    top: 5px;
+}
+.card.card.highlight-card span {
+    margin-left: 10px;
+}
+
+.card.highlight-card:hover {
+    text-decoration: none;
+    background-color: #d26105;
+}

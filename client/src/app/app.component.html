@@ -1,0 +1,26 @@
+<div class="toolbar" role="banner">
+  <img
+    height="30"
+    alt="Dialogflow Logo"
+    src="../assets/dialogflowlogo.svg"
+  />
+  <span>Self Service Desk Demo</span>
+  <div class="spacer"></div>
+  Language: EN
+  <div class="spacer"></div>
+</div>
+
+<div class="wrapper">
+
+  <div class="side flexcontainer" role="side">
+      <app-microphone></app-microphone>
+  </div>
+
+  <div class="content flexcontainer" role="main">
+    <div class="inner">
+      <app-dialogflow></app-dialogflow>
+    </div>
+  </div>
+
+</div>
+<router-outlet></router-outlet>
