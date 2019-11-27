@@ -9,15 +9,12 @@ err() {
 }
 
 bold "Set all vars..."
-
+set -a
+  source ./properties
+  set +a
 set -a
   source .env
   set +a
-
-if [ -z "$CLOUD_BUILD_EMAIL" ]; then
-  err "Cloud Build email is empty. Exiting."
-  exit 1
-fi
 
 bold "Starting the setup process in project $PROJECT_ID..."
 bold "Enable APIs..."
@@ -36,9 +33,7 @@ gcloud iam service-accounts create \
   $SERVICE_ACCOUNT_NAME \
   --display-name $SERVICE_ACCOUNT_NAME
 
-SA_EMAIL=$(gcloud iam service-accounts list \
-  --filter="displayName:$SERVICE_ACCOUNT_NAME" \
-  --format='value(email)')
+SA_EMAIL=$(gcloud iam service-accounts list --filter="displayName:$SERVICE_ACCOUNT_NAME" --format='value(email)')
   
 if [ -z "$SA_EMAIL" ]; then
   err "Service Account email is empty. Exiting."
@@ -76,13 +71,13 @@ ACCESS_TOKEN="$(gcloud auth application-default print-access-token)"
 #bold "Uploading Intents to $GCLOUD_STORAGE_BUCKET_NAME..."
 #gsutil cp dialogflow/agent/agent.zip gs://$GCLOUD_STORAGE_BUCKET_NAME/
 
-#bold "Create a Dialogflow Agent..."
-#echo $ACCESS_TOKEN
+bold "Create a Dialogflow Agent..."
+echo $ACCESS_TOKEN
 
-#JSONPROD="{\"defaultLanguageCode\":\"en\",\"displayName\":\"$PROD_AGENT_NAME\",\"parent\":\"projects/$PROJECT_ID\",\"timeZone\":\"Europe/Madrid\"}"
-#curl -H "Content-Type: application/json; charset=utf-8"  \
-#-H "Authorization: Bearer $ACCESS_TOKEN" \
-#-d $JSONPROD "https://dialogflow.googleapis.com/v2/projects/$PROJECT_ID/agent"
+JSONPROD="{\"defaultLanguageCode\":\"en\",\"displayName\":\"$PROD_AGENT_NAME\",\"parent\":\"projects/$PROJECT_ID\",\"timeZone\":\"Europe/Madrid\"}"
+curl -H "Content-Type: application/json; charset=utf-8"  \
+-H "Authorization: Bearer $ACCESS_TOKEN" \
+-d $JSONPROD "https://dialogflow.googleapis.com/v2/projects/$PROJECT_ID/agent"
 
 #IMPORTFILES="{\"agentUri\":\"gs://$GCLOUD_STORAGE_BUCKET_NAME/agent.zip\"}"
 #bold "Import Intents to Prod"

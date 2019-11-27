@@ -17,35 +17,39 @@
  */
 
 import * as dotenv from 'dotenv';
-
-/*import * as df from 'dialogflow';
+import * as df from 'dialogflow';
 import * as uuid from 'uuid';
-import * as fs from 'fs';
-import * as pump from 'pump';
-import * as through2 from 'through2';
 
-const wav = require('wav');*/
+// import * as fs from 'fs';
+// import * as pump from 'pump';
+// import * as through2 from 'through2';
+
+/*
+const wav = require('wav');
+*/
 
 dotenv.config();
 
 export class Dialogflow {
-    /*private sessionClient: any;
-    private sessionPath: any;
-    private fileWriter: any;
     private projectId: string;
+    private sessionClient: any;
+    private sessionPath: any;
     private sessionId: string;
     private languageCode: string;
     private encoding: string;
     private sampleRateHertz: Number;
     private singleUtterance: Boolean;
+
+    /*
+    private fileWriter: any;
     private isInitialRequest: Boolean;
-    public detectStreamCall: any;
+    public detectStreamCall: any;*/
 
     constructor() {
-        this.languageCode = 'en-US';
+        this.languageCode = process.env.LANGUAGE_CODE;
         this.projectId = process.env.PROJECT_ID;
-        this.encoding = 'AUDIO_ENCODING_LINEAR_16';
-        this.singleUtterance = true;
+        this.encoding = process.env.ENCODING;
+        this.singleUtterance = (process.env.SINGLE_UTTERANCE == 'true')
         this.isInitialRequest = true;
         this.detectStreamCall = null;
     }*/
