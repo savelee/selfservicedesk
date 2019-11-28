@@ -12,7 +12,8 @@
     "start": "node dist/api/index.js",
     "watch": "nodemon --watch \"**/*.ts\" --exec \"ts-node\" index.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "compile-proto": "mkdir -p pbjs-genfiles && pbjs -p ./node_modules/google-proto-files google/cloud/dialogflow/v2beta1/session.proto -o ./pbjs-genfiles/proto.js -t static-module"
   },
   "private": true,
   "dependencies": {
@@ -29,7 +30,11 @@
     "source-map-support": "^0.5.16",
     "through2": "^3.0.1",
     "uuid": "^3.3.3",
-    "wav": "^1.0.2"
+    "wav": "^1.0.2",
+    "google-auth-library": "^5.5.1",
+    "google-proto-files": "^1.1.1",
+    "node-fetch": "^2.6.0",
+    "protobufjs": "^6.8.8"
   },
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "3.3.0",
