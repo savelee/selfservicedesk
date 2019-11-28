@@ -72,4 +72,44 @@ function addMultipleEventListener(element: HTMLElement, events: Array<string>, h
     events.forEach(e => element.addEventListener(e, handler));
 }
 
-export {addClass, removeClass, hasClass, addMultipleEventListener};
+
+/**
+ * Convert a Float32 Buffer to Int16
+ * @param buffer Float 32 buffer
+ * @return Int16 buffer
+ */
+function convertFloat32ToInt16(buffer: any) {
+  let l = buffer.length;
+  let buf = new Int16Array(l);
+  while (l--) {
+      buf[l] = Math.min(1, buffer[l]) * 0x7FFF;
+  }
+  return buf.buffer;
+}
+
+/**
+ * Convert a Int16 Buffer to Float32
+ * @param buffer Int16 buffer
+ * @return Float32 buffer
+ */
+function convertInt16ToFloat32(buffer: any) {
+  let l = buffer.length;
+  let output = new Float32Array(buffer.length - 0);
+  for (let i = 0; i < l; i++) {
+      let int = buffer[i];
+      // If the high bit is on, then it is a negative number,
+      // and actually counts backwards.
+      let float = (int >= 0x8000) ? -(0x10000 - int) / 0x8000 : int / 0x7FFF;
+      output[i] = float;
+  }
+  return output;
+}
+
+export {
+  addClass,
+  removeClass,
+  hasClass,
+  addMultipleEventListener,
+  convertFloat32ToInt16,
+  convertInt16ToFloat32
+};

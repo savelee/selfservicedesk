@@ -42,10 +42,15 @@ export class App {
     private createApp(): void {
         this.app = express();
         this.app.use(cors());
-        this.app.use(express.static(path.join(__dirname, '../dist/app')));
+        this.app.use(function(_req, res, next) {
+            res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+            next();
+        });
 
+        this.app.use(express.static(path.join(__dirname, '../dist/public')));
+        
         this.app.get('/', (_req, res) => {
-            res.sendfile('../dist/app/index.html');
+            res.sendfile('../dist/public/index.html');
         });
         this.app.get('/test', function(_req, res) {
             res.setHeader('Content-Type', 'application/json');
@@ -59,24 +64,25 @@ export class App {
 
     private sockets(): void {
         this.io = socketIo(this.server);
+        console.log(this.io);
     }
 
     private listen(): void {
         this.server.listen(App.PORT, () => {
             console.log('Running server on port %s', App.PORT);
         });
-        let me = this;
+        // let me = this;
 
         this.io.on('connect', (client: any) => {
             console.log(`Client connected [id=${client.id}]`);
-            me.io.emit('setup', `Client connected [id=${client.id}]`);
+            client.emit('server_setup', `Server connected [id=${client.id}]`);
 
-            client.on('meta', (_meta: any) => {
-                console.log('Connected client on port %s.', App.PORT);
+            client.on('client_meta', (meta: any) => {
+                console.log(meta);
                 //dialogflow.setupDialogflow(meta);
             });
 
-            client.on('message', (stream: any, herz: number) => {
+            client.on('client_audio', (stream: any, herz: number) => {
                 console.log(herz);
                 console.log(stream);
                 // start streaming from client app to dialogflow

@@ -17,8 +17,9 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { addClass, removeClass, addMultipleEventListener } from '../helpers/helpers';
+import { addClass, addMultipleEventListener } from '../helpers/helpers';
 import { HttpClient } from '@angular/common/http';
+import { convertFloat32ToInt16 } from '../helpers/helpers';
 
 declare var MediaRecorder: any;
 
@@ -116,10 +117,9 @@ export class MicrophoneComponent implements OnInit {
       console.log(e);
     });
 
-    /*return new Promise(resolve => {
+    return new Promise(resolve => {
       resolve(me.meta);
-    });*/
-    return me.meta;
+    });
   }
 
   setupButtons() {
@@ -128,16 +128,20 @@ export class MicrophoneComponent implements OnInit {
     addMultipleEventListener(this.recordButton,
       ['touchstart', 'mousedown'], async function(e: Event) {
         e.preventDefault();
-        await me.setupMicrophone();
+        let meta = await me.setupMicrophone();
         addClass(me.recordButton, 'active');
         me.mediaRecorder.start();
+        let event = new CustomEvent('mic_start', {
+          detail: meta
+        });
+        window.dispatchEvent(event);
     });
     addMultipleEventListener(this.recordButton,
       ['touchend', 'mouseup'], function(e: Event) {
         e.preventDefault();
         me.recordButton.classList.remove('active');
         me.mediaRecorder.stop();
-        let event = new CustomEvent('stop', {
+        let event = new CustomEvent('mic_stop', {
           detail: 'stop'
         });
         window.dispatchEvent(event);
@@ -157,7 +161,7 @@ export class MicrophoneComponent implements OnInit {
 
     this.scriptProcessor.onaudioprocess = (e) => {
 
-      console.log(e.inputBuffer.getChannelData(0));
+      // console.log(e.inputBuffer.getChannelData(0));
       let stream = e.inputBuffer.getChannelData(0) ||
       new Float32Array(bufferLength);
 
@@ -166,60 +170,10 @@ export class MicrophoneComponent implements OnInit {
       // the buffer is empty.
       // this happens after this connecting
 
-      let event = new CustomEvent('audio', {
-        detail: this.convertFloat32ToInt16(stream)
+      let event = new CustomEvent('mic_rec', {
+        detail: convertFloat32ToInt16(stream)
       });
       window.dispatchEvent(event);
     };
   }
-
-  /*
-   * When working with Dialogflow and Dialogflow matched an intent,
-   * and returned an audio buffer. Play this output.
-   */
-  /*
-  playOutput(arrayBuffer: any) {
-    let me = this;
-    try {
-      // TODO why do I call this twice?
-      if (arrayBuffer.byteLength > 0) {
-        this.audioContext.decodeAudioData(arrayBuffer,
-        function(buffer: any) {
-          me.audioContext.resume();
-          me.outputSource = me.audioContext.createBufferSource();
-          me.outputSource.connect(me.audioContext.destination);
-          me.outputSource.buffer = buffer;
-          me.outputSource.start(0);
-        },
-        function() {
-          console.log(arguments);
-        });
-      }
-    } catch (e) {
-      console.log(e);
-    }
-
-  }*/
-
-  convertFloat32ToInt16(buffer: any) {
-      let l = buffer.length;
-      let buf = new Int16Array(l);
-      while (l--) {
-          buf[l] = Math.min(1, buffer[l]) * 0x7FFF;
-      }
-      return buf.buffer;
-  }
-  convertInt16ToFloat32(buffer: any) {
-    let l = buffer.length;
-    let output = new Float32Array(buffer.length - 0);
-    for (let i = 0; i < l; i++) {
-        let int = buffer[i];
-        // If the high bit is on, then it is a negative number,
-        // and actually counts backwards.
-        let float = (int >= 0x8000) ? -(0x10000 - int) / 0x8000 : int / 0x7FFF;
-        output[i] = float;
-    }
-    return output;
-  }
-
 }

@@ -12,7 +12,7 @@
     "start": "node dist/api/index.js",
     "watch": "nodemon --watch \"**/*.ts\" --exec \"ts-node\" index.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "build": "tsc -p src/api"
+    "build": "tsc -p ."
   },
   "private": true,
   "dependencies": {
