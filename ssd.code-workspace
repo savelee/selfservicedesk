@@ -1,9 +1,11 @@
 {
 	"folders": [
 		{
+			"name": "selfservicedesk",
 			"path": "."
 		},
 		{
+			"name": "dialogflow",
 			"path": "dialogflow"
 		}
 	],

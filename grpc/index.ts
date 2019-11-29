@@ -30,65 +30,62 @@
  *
  */
 
+declare function require(name:string);
+
 // the generated Dialogflow proto
-const Dialogflow = require('../pbjs-genfiles/proto').google.cloud.dialogflow.v2beta1;
+const Dialogflow = require('./pbjs-genfiles/proto').google.cloud.dialogflow.v2beta1;
 // for service account auth
-const auth = require('google-auth-library');
-// const {GoogleAuth} = require('google-auth-library');
+const {GoogleAuth} = require('google-auth-library');
 // to fetch the gRPC url 
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
+
+const languageCode = 'en-GB';
 
 async function main() {
-  let headers = {};
-
-  if (process.env['GOOGLE_APPLICATION_CREDENTIALS']) {
-    // service account authentication
-    const serviceUri =
-      'https://dialogflow.googleapis.com/google.cloud.dialogflow.v2beta1.Sessions';
-    const googleAuth = new auth.GoogleAuth();
-    const client = await googleAuth.getClient();
-    headers = await client.getRequestHeaders(serviceUri);
-  } else if (process.env['GOOGLE_API_KEY']) {
-    // API key authentication
-    headers = {'X-Goog-Api-Key': process.env['GOOGLE_API_KEY']};
-  } else {
-    throw new Error(
-      'Please set one of environment variables: GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_API_KEY'
-    );
-  }
-
-  /*
-      const auth = new GoogleAuth({
-      scopes: 'https://www.googleapis.com/auth/cloud-platform'
-    });
-    const client = await auth.getClient();
-    const projectId = await auth.getProjectId();
-    const url = `https://dns.googleapis.com/dns/v1/projects/${projectId}`;
-    const res = await client.request({ url });
-    console.log(res.data);
-  */
-
-
-  headers['Content-Type'] = 'application/x-protobuf';
-
+  
+  const auth = new GoogleAuth({
+    scopes: [
+      'https://www.googleapis.com/auth/cloud-platform',
+      'https://www.googleapis.com/auth/dialogflow',
+    ]
+  });
+  const client = await auth.getClient();
+  const projectId = await auth.getProjectId();
+  
   // the urls to make the RPC calls to
   const detectUrl = 'https://dialogflow.googleapis.com/$rpc/google.cloud.dialogflow.v2beta1.Sessions/DetectIntent';
-  const streamingUrl = 'https://dialogflow.googleapis.com/$rpc/google.cloud.dialogflow.v2beta1.Sessions/StreamingDetectIntent';
+  // const streamingUrl = 'https://dialogflow.googleapis.com/$rpc/google.cloud.dialogflow.v2beta1.Sessions/StreamingDetectIntent';
   
+  const headers = await client.getRequestHeaders();
+  headers['Content-Type'] = 'application/x-protobuf';
+
+  console.log('Headers :');
+  console.log(headers);
+
+  console.log('Dialoglow Proto');
+  //console.log(Dialogflow);
+
   // the formatted requests, based on the specs in the documentation
-  const request = Dialogflow.DetectIntent.fromObject({
-    session: 'projects/myprojectid/agent/sessions/mysessionid',
-    query_input: 'Hello, how are you doing?'
+  const request = Dialogflow.DetectIntentRequest.fromObject({
+    session: `projects/${projectId}/agent/sessions/mysessionid`,
+    queryInput: {
+        text: {
+          text: 'Hello, how are you doing?',
+          languageCode
+        }
+      }
   });
+
+  console.log(request);
 
   // encode the request to a request buffer, by using the encode helper
   // method, part of the generated Proto.
-  const requestBuffer = Dialogflow.DetectIntent.encode(
+  const requestBuffer = Dialogflow.DetectIntentRequest.encode(
     request
   ).finish();
 
   // Fetch URL
-  const fetchResult = await fetch(url, {
+  const fetchResult = await fetch(detectUrl, {
     headers,
     method: 'post',
     body: requestBuffer,
@@ -101,7 +98,7 @@ async function main() {
   const responseArrayBuffer = await fetchResult.arrayBuffer();
 
   // Make the results readable
-  const response = Dialogflow.DetectIntent.decode(
+  const response = Dialogflow.DetectIntentResponse.decode(
     Buffer.from(responseArrayBuffer)
   );
 
