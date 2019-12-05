@@ -1,26 +1,31 @@
 {
-    "compilerOptions": {
-      "target": "es6",
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "outDir": "../dist/",
-      "allowSyntheticDefaultImports": true,
-      "allowJs": true,
-      "importHelpers": true,
-      "jsx": "react",
-      "alwaysStrict": true,
-      "sourceMap": true,
-      "forceConsistentCasingInFileNames": true,
-      "noFallthroughCasesInSwitch": true,
-      "noImplicitReturns": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "noImplicitAny": false,
-      "noImplicitThis": false,
-      "strictNullChecks": false,
-      "strictFunctionTypes": false
-    },
-    "include": [
-      "*"
-    ],
-  }
+"compilerOptions": {
+  "module": "commonjs",
+  "noImplicitAny": true,
+  "sourceMap": true,
+  "removeComments": true,
+  "preserveConstEnums": true,
+  "declaration": true,
+  "target": "es5",
+  "lib": ["es2015", "dom"],
+  "outDir": "./dist/server",
+  "noUnusedLocals": false,
+  "noImplicitReturns": true,
+  "noImplicitThis": true,
+  "alwaysStrict": true,
+  "noUnusedParameters": false,
+  "pretty": true,
+  "noFallthroughCasesInSwitch": true,
+  "allowUnreachableCode": false,
+  "experimentalDecorators": true,
+  "types": ["node"],
+  "typeRoots": [ "./types", "./node_modules/@types"]
+},
+"include": [
+  "server/*"
+],
+"exclude": [
+  "server/node_modules/",
+  "types/"
+]
+}

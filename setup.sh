@@ -23,6 +23,7 @@ gcloud services enable \
   cloudtrace.googleapis.com \
   dialogflow.googleapis.com \
   logging.googleapis.com \
+  dns.googleapis.com \
   monitoring.googleapis.com \
   sourcerepo.googleapis.com \
   translate.googleapis.com
@@ -58,6 +59,9 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member serviceAccount:$SA_EMAIL \
   --role roles/iam.serviceAccountKeyAdmin
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member serviceAccount:$SA_EMAIL \
+  --role roles/dns.admin
 
 bold "Saving the key..."
 gcloud iam service-accounts keys create ../master.json \

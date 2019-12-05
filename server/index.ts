@@ -16,101 +16,117 @@
  * =============================================================================
  */
 
-import { createServer } from 'http';
-// import { dialogflow } from './dialogflow';
-import * as express from 'express';
+import * as dotenv from 'dotenv';
+import { dialogflow } from './dialogflow';
 import * as socketIo from 'socket.io';
 import * as path from 'path';
-import * as cors from 'cors';
+import * as fs from 'fs';
+import * as uuid from 'uuid';
+import * as url from 'url';
+import * as http from 'http';
+//import * as cors from 'cors';
+
+dotenv.config();
 
 import * as sourceMapSupport from 'source-map-support';
 sourceMapSupport.install();
 
 export class App {
-    public static readonly PORT:number = 3000;
-    private app: express.Application;
+    public static readonly PORT:number = parseInt(process.env.PORT) || 9001;
     private server: any;
     private io: SocketIO.Server;
-
+    
     constructor() {
-        this.createApp();
         this.createServer();
         this.sockets();
         this.listen();
     }
 
-    private createApp(): void {
-        this.app = express();
-        this.app.use(cors());
-        this.app.use(function(_req, res, next) {
-            res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-            next();
-        });
-
-        this.app.use(express.static(path.join(__dirname, '../dist/public')));
-        
-        this.app.get('/', (_req, res) => {
-            res.sendfile('../dist/public/index.html');
-        });
-        this.app.get('/test', function(_req, res) {
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ results: true }));
-        });
-    }
-
     private createServer(): void {
-        this.server = createServer(this.app);
+
+        this.server = http.createServer(function (request, response) {
+            var uri = url.parse(request.url).pathname,
+              filename = path.join(process.cwd(), uri);
+
+              fs.exists(filename, function (exists) {
+                if (!exists) {
+                    response.writeHead(404, {
+                        "Content-Type": "text/plain"
+                    });
+                    response.write('404 Not Found: ' + filename + '\n');
+                    response.end();
+                    return;
+                }
+              });
+
+              if (fs.statSync(filename).isDirectory()) filename += '../dist/index.html';
+
+              fs.readFile(filename, 'binary', function (err, file) {
+                if (err) {
+                    response.writeHead(500, {
+                        "Content-Type": "text/plain"
+                    });
+                    response.write(err + "\n");
+                    response.end();
+                    return;
+                }
+    
+                response.writeHead(200);
+                response.write(file, 'binary');
+                response.end();
+            });
+
+        });
     }
 
     private sockets(): void {
         this.io = socketIo(this.server);
-        console.log(this.io);
     }
 
     private listen(): void {
+        let me = this;
         this.server.listen(App.PORT, () => {
             console.log('Running server on port %s', App.PORT);
         });
-        // let me = this;
 
         this.io.on('connect', (client: any) => {
             console.log(`Client connected [id=${client.id}]`);
             client.emit('server_setup', `Server connected [id=${client.id}]`);
 
-            client.on('client_meta', (meta: any) => {
-                console.log(meta);
-                //dialogflow.setupDialogflow(meta);
-            });
-
-            client.on('client_audio', (stream: any, herz: number) => {
-                console.log(herz);
-                console.log(stream);
-                // start streaming from client app to dialogflow
-                // dialogflow.prepareStream(stream, function(audioBuffer: any){
-                    // sending to individual socketid (private message)
-                    // client.emit('broadcast', audioBuffer);
-                    // dialogflow.detectStreamCall.end();
-                // });
-                // dialogflow.createAudioFile(stream);
-            });
-            client.on('stop', () => {
-                console.log('finalize stream');
-                // stop the client stream, and start detecting
-                // dialogflow.finalizeStream();
-                // dialogflow.detectIntent(function(audioBuffer: any){
-                    // sending to individual socketid (private message)
-                    // client.emit('broadcast', audioBuffer);
-                //});
-            });
-
-            client.on('disconnect', () => {
-                console.log('Client disconnected');
+            client.on('message', function (data: any) {
+                var fileName = uuid.v4();
+                me.writeToDisk(data.audio.dataURL, fileName + '.wav');
             });
         });
     }
 
-    public getApp(): express.Application {
-        return this.app;
+    public writeToDisk(dataURL: string, fileName: any): void {
+        let fileExtension = fileName.split('.').pop(),
+        fileRootNameWithBase = path.join(__dirname, '..', 'upload', fileName),
+        filePath = fileRootNameWithBase,
+        fileID = 2,
+        fileBuffer;
+
+        // @todo return the new filename to client
+        while (fs.existsSync(filePath)) {
+            filePath = fileRootNameWithBase + '(' + fileID + ').' + fileExtension;
+            fileID += 1;
+        }
+
+        dataURL = dataURL.split(',').pop();
+        fileBuffer = Buffer.from(dataURL, 'base64');
+        console.log('filePath', filePath);
+        console.log(fileBuffer);
+
+        console.log(dialogflow);
+
+        dialogflow.detectStream(fileBuffer, function(results: any){
+            console.log(results);
+        });
+
+        fs.writeFileSync(filePath, fileBuffer);
+
+        console.log('filePath', filePath);
     }
 }
 

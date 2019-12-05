@@ -56,7 +56,11 @@ async function main() {
   const detectUrl = 'https://dialogflow.googleapis.com/$rpc/google.cloud.dialogflow.v2beta1.Sessions/DetectIntent';
   // const streamingUrl = 'https://dialogflow.googleapis.com/$rpc/google.cloud.dialogflow.v2beta1.Sessions/StreamingDetectIntent';
   
-  const headers = await client.getRequestHeaders();
+  //const headers = await client.getRequestHeaders();
+  
+  const headers = {
+    "authorization": "Bearer " + "ya29.c.KmCzB3uE8YVcOe_o_KLaOU4CQseH_rQwlvYmXSpCY0fn9TqUDkie4OJXrY8sn45SrHe-YdCAXkC-Grpy73YG4U3sk3LMtcY8h9JO3o9xOHOVLMER45ZkCvJHACwK5GUmUlY",
+  }
   headers['Content-Type'] = 'application/x-protobuf';
 
   console.log('Headers :');

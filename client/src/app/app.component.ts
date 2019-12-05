@@ -39,10 +39,10 @@ export class AppComponent {
     this.socket = io();
     this.socket.binaryType = 'arraybuffer';
 
-    this.socket.on('connect', function(){
+    this.socket.on('connect', function() {
       console.log('socket connection made');
     });
-    this.socket.on('disconnect', function(){
+    this.socket.on('disconnect', function() {
       console.log('sockets disconnected');
     });
 

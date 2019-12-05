@@ -60,7 +60,6 @@ export class MicrophoneComponent implements OnInit {
       this.mediaStream = null;
       this.outputChunks = [];
       this.http = http;
-      console.log(this.http.get('/api/test').subscribe(data => console.log(data)));
 
       // this.fileReader = new FileReader();
     }

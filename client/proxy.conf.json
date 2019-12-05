@@ -1,10 +1,9 @@
 {
-  "/api/*": {
+  "/auth": {
     "target": "http://localhost:3000",
     "secure": false,
     "changeOrigin": true,
-    "logLevel": "debug",
-    "pathRewrite": {"^/api" : ""}
+    "logLevel": "debug"
   },
   "/socket.io/*": {
     "target": "http://localhost:3000",

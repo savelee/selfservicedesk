@@ -16,74 +16,52 @@
  * =============================================================================
  */
 
+
 import * as dotenv from 'dotenv';
-import * as df from 'dialogflow';
 import * as uuid from 'uuid';
+import * as pb from 'pb-util';
 
-// import * as fs from 'fs';
-// import * as pump from 'pump';
-// import * as through2 from 'through2';
-
-/*
-const wav = require('wav');
-*/
+const df = require('dialogflow').v2beta1;
 
 dotenv.config();
 
 export class Dialogflow {
     private projectId: string;
-    private sessionClient: any;
-    private sessionPath: any;
-    private sessionId: string;
     private languageCode: string;
     private encoding: string;
     private sampleRateHertz: Number;
     private singleUtterance: Boolean;
 
-    /*
-    private fileWriter: any;
-    private isInitialRequest: Boolean;
-    public detectStreamCall: any;*/
-
+    private sessionClient: any;
+    private sessionPath: any;
+    private sessionId: string;
+    
     constructor() {
         this.languageCode = process.env.LANGUAGE_CODE;
         this.projectId = process.env.PROJECT_ID;
         this.encoding = process.env.ENCODING;
-        this.singleUtterance = (process.env.SINGLE_UTTERANCE == 'true')
-        this.isInitialRequest = true;
-        this.detectStreamCall = null;
-    }*/
+        this.singleUtterance = ((process.env.SINGLE_UTTERANCE == 'true') || true);
+        this.sampleRateHertz = (parseInt(process.env.SAMPLE_HERZ) || 44100);
+        this.setupDialogflow();
+    }
 
     /*
      * Setup the Dialogflow Agent
-     *
-    public setupDialogflow(meta: any) {
+     */
+    public setupDialogflow() {
         this.sessionId = uuid.v4();
-        this.sessionClient = new df.v2beta1.SessionsClient();
-        this.sessionPath = this.sessionClient.sessionPath(
-            this.projectId, this.sessionId);
-
-        this.sampleRateHertz = meta.sampleHerz;
-
-        this.fileWriter = new wav.FileWriter(
-          'temp/' + this.sessionId + '.wav', {
-            channels: meta.channels,
-            sampleRate: this.sampleRateHertz,
-            bitDepth: 16
-        });
-
+        this.sessionClient = new df.SessionsClient();
+        console.log(this.projectId);
+        console.log(this.sessionId);
+        this.sessionPath = this.sessionClient.sessionPath(this.projectId, this.sessionId);
     }
 
-    public createAudioFile(audio: any) {
-        // create a wav file
-        this.fileWriter.write(audio);
-    }
-
-    public async detectIntent(cb:Function) {
-      // Read the content of the audio file and send it
-      // as part of the request.
-      const inputAudio = fs.createReadStream('temp/' + this.sessionId + '.wav');
-      console.log(inputAudio);
+    /*
+     * Detect Intent based on Audio Stream
+     * @param audio
+     * @param cb Callback function to send results
+     */
+    public async detectStream(audio: any, cb:Function){
       const request = {
         session: this.sessionPath,
         queryInput: {
@@ -92,112 +70,40 @@ export class Dialogflow {
             audioEncoding: this.encoding,
             languageCode: this.languageCode,
           },
-        },
-        inputAudio: inputAudio,
-        outputAudioConfig: {
-          audioEncoding: 'OUTPUT_AUDIO_ENCODING_LINEAR_16',
-          sampleRateHertz: 48000,
-          synthesizeSpeechConfig: {
-            voice: {
-              ssmlGender: 'SSML_VOICE_GENDER_FEMALE'
-            },
-            speakingRate: 1.5,
-            pitch: 7
-          }
-        }
-      };
-
-      // Recognizes the speech in the audio and detects its intent.
-      const [response] = await this.sessionClient.detectIntent(request);
-
-      console.log(response);
-
-      cb(response);
-    }*/
-
-    /*
-     * Detect Intent based on Audio Stream
-     * @param audio
-     * @param cb Callback function to send results
-     *
-    public prepareStream(audio: any, cb:Function){
-      const initialStreamRequest = {
-        session: this.sessionPath,
-        queryParams: {
-          session: this.sessionClient.sessionPath(
-              this.projectId, this.sessionId),
-        },
-        queryInput: {
-          audioConfig: {
-            sampleRateHertz: this.sampleRateHertz,
-            audioEncoding: this.encoding,
-            languageCode: this.languageCode,
-          },
           singleUtterance: this.singleUtterance
         },
-        outputAudioConfig: {
-          audioEncoding: 'OUTPUT_AUDIO_ENCODING_LINEAR_16',
-          sampleRateHertz: 48000,
-          synthesizeSpeechConfig: {
-            voice: {
-              ssmlGender: 'SSML_VOICE_GENDER_FEMALE'
-            },
-            speakingRate: 1.5,
-            pitch: 7
-          }
-        }
+        inputAudio: audio
       };
 
-      // Create a stream for the streaming request.
-      this.detectStreamCall = this.sessionClient
-      .streamingDetectIntent()
-        .on('error', (e: any) => {
-          console.log(e);
-        }).on('data', (data: any) => {
-          if (data.recognitionResult) {
-            console.log(
-              `Intermediate transcript:
-              ${data.recognitionResult.transcript}`
-            );
-          } else {
-              console.log(`Detected intent:`);
-              console.log(data.outputAudio);
-              cb(data.outputAudio);
-          }
-        }).on('end', () => {
-          console.log('on end');
+      console.log(request);
+      // Recognizes the speech in the audio and detects its intent.
+      const responses = await this.sessionClient.detectIntent(request);
+      const contextClient = new df.ContextsClient();
+      const result = responses[0].queryResult;
+      console.log(`  Query: ${result.queryText}`);
+      console.log(`  Response: ${result.fulfillmentText}`);
+      if (result.intent) {
+        console.log(`  Intent: ${result.intent.displayName}`);
+      } else {
+        console.log(`  No intent matched.`);
+      }
+      const parameters = JSON.stringify(pb.struct.decode(result.parameters));
+      console.log(`  Parameters: ${parameters}`);
+      if (result.outputContexts && result.outputContexts.length) {
+        console.log(`  Output contexts:`);
+        result.outputContexts.forEach(function(context: any) {
+          const contextId = contextClient.matchContextFromContextName(context.name);
+          const contextParameters = JSON.stringify(
+            pb.struct.decode(context.parameters)
+          );
+          console.log(`    ${contextId}`);
+          console.log(`      lifespan: ${context.lifespanCount}`);
+          console.log(`      parameters: ${contextParameters}`);
         });
-        
-        // Write the initial stream request to config for audio input.
-        if(this.isInitialRequest) {
-          this.detectStreamCall.write(initialStreamRequest);
-        }
-
-        // create a wav file
-        this.fileWriter.write(audio);
-    }*/
-
-    /*
-     * When Streaming stops, remove the temp wav file.
-     *
-    public finalizeStream() {
-
-      // start streaming the contents of the wav file
-      // to the Dialogflow Streaming API
-      pump(
-        fs.createReadStream('temp/' + this.sessionId + '.wav'),
-        // Format the audio stream into the request format.
-        through2.obj((obj:any, _:any, next:any) => {
-          next(null, {inputAudio: obj});
-        }),
-        this.detectStreamCall
-      );
-
-      fs.unlink('temp/' + this.sessionId + '.wav', (err) => {
-        if (err) throw console.log(err);
-        console.log('Audio file was deleted');
-      });
-    }*/
+      }
+      
+      cb(result);
+    }
 }
 
 export let dialogflow = new Dialogflow();
