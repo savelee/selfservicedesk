@@ -21,10 +21,8 @@ import { dialogflow } from './dialogflow';
 import * as socketIo from 'socket.io';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as uuid from 'uuid';
 import * as url from 'url';
 import * as http from 'http';
-//import * as cors from 'cors';
 
 dotenv.config();
 
@@ -94,39 +92,18 @@ export class App {
             client.emit('server_setup', `Server connected [id=${client.id}]`);
 
             client.on('message', function (data: any) {
-                var fileName = uuid.v4();
-                me.writeToDisk(data.audio.dataURL, fileName + '.wav');
+                me.prepareAudio(data.audio.dataURL);
             });
         });
     }
 
-    public writeToDisk(dataURL: string, fileName: any): void {
-        let fileExtension = fileName.split('.').pop(),
-        fileRootNameWithBase = path.join(__dirname, '..', 'upload', fileName),
-        filePath = fileRootNameWithBase,
-        fileID = 2,
-        fileBuffer;
-
-        // @todo return the new filename to client
-        while (fs.existsSync(filePath)) {
-            filePath = fileRootNameWithBase + '(' + fileID + ').' + fileExtension;
-            fileID += 1;
-        }
-
+    public prepareAudio(dataURL: string): void {
         dataURL = dataURL.split(',').pop();
-        fileBuffer = Buffer.from(dataURL, 'base64');
-        console.log('filePath', filePath);
-        console.log(fileBuffer);
-
-        console.log(dialogflow);
+        let fileBuffer = Buffer.from(dataURL, 'base64');
 
         dialogflow.detectStream(fileBuffer, function(results: any){
             console.log(results);
         });
-
-        fs.writeFileSync(filePath, fileBuffer);
-
-        console.log('filePath', filePath);
     }
 }
 
