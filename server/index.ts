@@ -24,6 +24,8 @@ import * as fs from 'fs';
 import * as url from 'url';
 import * as http from 'http';
 
+const ss = require('socket.io-stream');
+
 dotenv.config();
 
 import * as sourceMapSupport from 'source-map-support';
@@ -92,16 +94,51 @@ export class App {
             client.emit('server_setup', `Server connected [id=${client.id}]`);
 
             client.on('message', function (data: any) {
-                me.prepareAudio(data.audio.dataURL);
+                //me.prepareAudioDetection(data.audio.dataURL);
             });
+
+            
+            ss(client).on('stream', function(stream: any, data: any) {
+                var filename = path.basename(data.name);
+                stream.pipe(fs.createWriteStream(filename));
+
+                dialogflow.detectIntentStream(stream, function(result: any){
+                    console.log(result);
+                });
+            
+                
+
+                stream.on('data', function(chunk: any){
+                    // console.log(chunk);
+                });
+                stream.on('end', function () {
+                    console.log('end');
+                });
+
+            });
+
+            /*
+            client.on('stream', function (data: any) {
+
+                const filePath = path.resolve(__dirname, './track.wav');
+                // get file info
+                const stat = fileSystem.statSync(filePath);
+                const readStream = fileSystem.createReadStream(filePath);
+                // pipe stream with response stream
+                readStream.pipe(stream);
+                ss(client).emit('track-stream', stream, { stat });
+
+                //me.prepareAudioStreamDetection(data);
+            });*/
+
         });
     }
 
-    public prepareAudio(dataURL: string): void {
+    public prepareAudioDetection(dataURL: string): void {
         dataURL = dataURL.split(',').pop();
         let fileBuffer = Buffer.from(dataURL, 'base64');
 
-        dialogflow.detectStream(fileBuffer, function(results: any){
+        dialogflow.detectIntent(fileBuffer, function(results: any){
             console.log(results);
         });
     }
