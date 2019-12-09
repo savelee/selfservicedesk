@@ -97,7 +97,6 @@ export class App {
                 //me.prepareAudioDetection(data.audio.dataURL);
             });
 
-            
             ss(client).on('stream', function(stream: any, data: any) {
                 var filename = path.basename(data.name);
                 stream.pipe(fs.createWriteStream(filename));
@@ -106,31 +105,14 @@ export class App {
                     console.log(result);
                 });
             
-                
-
                 stream.on('data', function(chunk: any){
                     // console.log(chunk);
                 });
                 stream.on('end', function () {
-                    console.log('end');
+                    //console.log('end');
                 });
 
             });
-
-            /*
-            client.on('stream', function (data: any) {
-
-                const filePath = path.resolve(__dirname, './track.wav');
-                // get file info
-                const stat = fileSystem.statSync(filePath);
-                const readStream = fileSystem.createReadStream(filePath);
-                // pipe stream with response stream
-                readStream.pipe(stream);
-                ss(client).emit('track-stream', stream, { stat });
-
-                //me.prepareAudioStreamDetection(data);
-            });*/
-
         });
     }
 
