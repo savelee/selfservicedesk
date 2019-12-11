@@ -71,13 +71,6 @@
     "ts-node": "^8.0.2",
     "tsify": "^4.0.1",
     "tslint": "~5.20.1",
-    "typescript": "^3.5.3",
-    "google-proto-files": "^1.1.1",
-    "@grpc/proto-loader": "^0.3.0",
-    "google-protobuf": "^3.6.1",
-    "grpc": "^1.24.2",
-    "grpc-web": "^1.0.7",
-    "webpack": "^4.16.5",
-    "webpack-cli": "^3.1.0"
+    "typescript": "^3.5.3"
   }
 }
