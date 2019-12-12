@@ -30,7 +30,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/recordrtc.min.js"
+            ]
           },
           "configurations": {
             "production": {

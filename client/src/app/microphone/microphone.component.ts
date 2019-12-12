@@ -20,12 +20,17 @@ import { Component, OnInit } from '@angular/core';
 import { addClass, addMultipleEventListener } from '../helpers/helpers';
 import { HttpClient } from '@angular/common/http';
 import { convertFloat32ToInt16 } from '../helpers/helpers';
+import * as io from 'socket.io-client';
 
-declare var MediaRecorder: any;
+declare const RecordRTC: any;
+declare const StereoAudioRecorder: any;
+declare const ss: any;
 
 const SELECTORS = {
   AUDIO_ELEMENT: '.audio_element',
-  MIC_RECORD_BUTTON: '.mic_button'
+  MIC_RECORD_BUTTON: '.mic_button',
+  START_RECORD_BUTTON: '.start_btn',
+  STOP_RECORD_BUTTON: '.stop_btn',
 };
 
 @Component({
@@ -36,143 +41,121 @@ const SELECTORS = {
 
 /** Initializes and manages interaction with the camera */
 export class MicrophoneComponent implements OnInit {
-
-    /** The HTMLAudioElement used to play audio from the microphone */
-    audioElement: HTMLAudioElement;
-    recordButton: HTMLElement;
-    microphonePaused: boolean;
-    audioContext: any;
-    outputChunks: Array<any>;
-    mediaStream: any;
-    mediaRecorder: any;
-    meta: {
-      sampleHerz: number,
-      channels: number
-    };
-    source: MediaStreamAudioSourceNode;
-    outputSource: AudioBufferSourceNode;
-    scriptProcessor: ScriptProcessorNode;
-    // fileElement: HTMLElement;
-    // fileReader: any;
+    public recordAudio: any;
+    socket: any;
+    socketio: any;
 
     constructor(private http: HttpClient) {
-      this.microphonePaused = false;
-      this.mediaStream = null;
-      this.outputChunks = [];
       this.http = http;
 
-      // this.fileReader = new FileReader();
-    }
+      this.socketio = io();
+      this.socket = this.socketio.on('connect', function() {
+          // reset the recorder
+          // startRecording.disabled = false;
+      });
+    
+      // const startRecording = document.getElementById('start-recording');
+      // const stopRecording = document.getElementById('stop-recording');
+  }
 
   ngOnInit() {
-    this.recordButton = <HTMLElement> document.querySelector(SELECTORS.MIC_RECORD_BUTTON);
-    this.setupButtons();
+   // this.recordButton = <HTMLElement> document.querySelector(SELECTORS.MIC_RECORD_BUTTON);
+    // this.startButton = <HTMLElement> document.querySelector(SELECTORS.START_RECORD_BUTTON);
+    // this.stopButton = <HTMLElement> document.querySelector(SELECTORS.STOP_RECORD_BUTTON);
+    
+    //bthis.setupButtons();
+    console.log(RecordRTC);
   }
 
-  /**
-   * Requests access to the microphone
-   *
-   * @async
-   */
-  async setupMicrophone() {
-    let me = this;
-    me.audioContext = new AudioContext();
-
-    me.audioElement = <HTMLAudioElement> document.querySelector(SELECTORS.AUDIO_ELEMENT);
-    me.meta = {
-      sampleHerz: me.audioContext.sampleRate,
-      channels: me.audioContext.destination.numberOfInputs
-    };
-
-    await navigator.mediaDevices.getUserMedia({
-      audio: {
-        deviceId: 'mic'
-      }
-    }).then(function(s: MediaStream) {
-          me.mediaStream = s;
-          me.mediaRecorder = new MediaRecorder(me.mediaStream);
-          me.getMicStream();
-
-          me.mediaRecorder.addEventListener('start', (e: any) => {
-            me.outputChunks = [];
-            let event = new CustomEvent('start', {
-              detail: 'start'
-            });
-            window.dispatchEvent(event);
-
-            me.source = me.audioContext.createMediaStreamSource(me.mediaStream);
-            me.source.connect(me.scriptProcessor);
-            me.scriptProcessor.connect(me.audioContext.destination);
-          });
-
-          me.mediaRecorder.addEventListener('stop', (e: any) => {
-            // TODO problem in IOS
-            // after you disconnect the audionode and script processor
-            // the buffer will be nulled out.
-            me.source.disconnect(me.scriptProcessor);
-            me.scriptProcessor.disconnect(me.audioContext.destination);
-          });
-    }).catch(function(e) {
-      console.log(e);
-    });
-
-    return new Promise(resolve => {
-      resolve(me.meta);
-    });
-  }
-
+  /*
   setupButtons() {
     let me = this;
 
     addMultipleEventListener(this.recordButton,
       ['touchstart', 'mousedown'], async function(e: Event) {
         e.preventDefault();
-        let meta = await me.setupMicrophone();
-        addClass(me.recordButton, 'active');
-        me.mediaRecorder.start();
-        let event = new CustomEvent('mic_start', {
-          detail: meta
-        });
-        window.dispatchEvent(event);
+
     });
     addMultipleEventListener(this.recordButton,
       ['touchend', 'mouseup'], function(e: Event) {
         e.preventDefault();
-        me.recordButton.classList.remove('active');
-        me.mediaRecorder.stop();
-        let event = new CustomEvent('mic_stop', {
-          detail: 'stop'
-        });
-        window.dispatchEvent(event);
     });
     addMultipleEventListener(this.recordButton,
       ['touchcancel', 'touchmove'], function(e: Event) {
         e.preventDefault();
     });
+  }*/
+
+  onStart() {
+    // recording started
+    // startRecording.disabled = true;
+    let me = this;
+    // make use of HTML 5/WebRTC, JavaScript getUserMedia()
+    // to capture the browser microphone stream
+    navigator.getUserMedia({
+        audio: true
+    }, function(stream) {
+        me.recordAudio = RecordRTC(stream, {
+            type: 'audio',
+            mimeType: 'audio/webm',
+            sampleRate: 44100, // this sampleRate should be the same in your server code
+
+            // MediaStreamRecorder, StereoAudioRecorder, WebAssemblyRecorder
+            // CanvasRecorder, GifRecorder, WhammyRecorder
+            recorderType: StereoAudioRecorder,
+
+            // Dialogflow / STT requires mono audio
+            numberOfAudioChannels: 1,
+
+            // get intervals based blobs
+            // value in milliseconds
+            // as you might not want to make detect calls every seconds
+            timeSlice: 5000,
+
+            // as soon as the stream is available
+            ondataavailable: function(blob) {
+                // making use of socket.io-stream for bi-directional
+                // streaming, create a stream
+                const stream = ss.createStream();
+                // stream directly to server
+                // it will be temp. stored locally
+                ss(me.socket).emit('stream', stream, {
+                    name: '../_temp/stream.wav',
+                    size: blob.size
+                });
+                // pipe the audio blob to the read stream
+                ss.createBlobReadStream(blob).pipe(stream);
+            }
+        });
+        
+
+        me.recordAudio.startRecording();
+        // stopRecording.disabled = false;
+    }, function(error) {
+        console.error(JSON.stringify(error));
+    });
   }
 
-  getMicStream() {
-    const me = this;
-    const bufferLength = 4096;
-    me.source = me.audioContext.createMediaStreamSource(me.mediaStream);
-    me.scriptProcessor =
-      me.audioContext.createScriptProcessor(bufferLength, 1, 1);
+  onStop(){
+     // recording stopped
+     // startRecording.disabled = false;
+     // stopRecording.disabled = true;
 
-    this.scriptProcessor.onaudioprocess = (e) => {
+     // stop audio recorder
+     let me = this;
+     this.recordAudio.stopRecording(function() {
 
-      // console.log(e.inputBuffer.getChannelData(0));
-      let stream = e.inputBuffer.getChannelData(0) ||
-      new Float32Array(bufferLength);
-
-      // TODO this is the problem, the 2nd time,
-      // after starting the recording processor
-      // the buffer is empty.
-      // this happens after this connecting
-
-      let event = new CustomEvent('mic_rec', {
-        detail: convertFloat32ToInt16(stream)
-      });
-      window.dispatchEvent(event);
-    };
+         // after stopping the audio, get the audio data
+         me.recordAudio.getDataURL(function(audioDataURL) {
+             var files = {
+                 audio: {
+                     type: me.recordAudio.getBlob().type || 'audio/wav',
+                     dataURL: audioDataURL
+                 }
+             };
+             // submit the audio file to the server
+             me.socketio.emit('message', files);
+         });
+     });
   }
 }

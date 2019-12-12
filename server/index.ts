@@ -23,60 +23,42 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as http from 'http';
+import * as express from 'express';
+import * as cors from 'cors';
+import * as sourceMapSupport from 'source-map-support';
 
 const ss = require('socket.io-stream');
 
 dotenv.config();
-
-import * as sourceMapSupport from 'source-map-support';
 sourceMapSupport.install();
 
 export class App {
     public static readonly PORT:number = parseInt(process.env.PORT) || 9001;
-    private server: any;
+    private app: express.Application;
+    private server: http.Server;
     private io: SocketIO.Server;
     
     constructor() {
+        this.createApp();
         this.createServer();
         this.sockets();
         this.listen();
     }
 
-    private createServer(): void {
-
-        this.server = http.createServer(function (request, response) {
-            var uri = url.parse(request.url).pathname,
-              filename = path.join(process.cwd(), uri);
-
-              fs.exists(filename, function (exists) {
-                if (!exists) {
-                    response.writeHead(404, {
-                        "Content-Type": "text/plain"
-                    });
-                    response.write('404 Not Found: ' + filename + '\n');
-                    response.end();
-                    return;
-                }
-              });
-
-              if (fs.statSync(filename).isDirectory()) filename += '../dist/index.html';
-
-              fs.readFile(filename, 'binary', function (err, file) {
-                if (err) {
-                    response.writeHead(500, {
-                        "Content-Type": "text/plain"
-                    });
-                    response.write(err + "\n");
-                    response.end();
-                    return;
-                }
-    
-                response.writeHead(200);
-                response.write(file, 'binary');
-                response.end();
-            });
-
+    private createApp(): void {
+        this.app = express();
+        this.app.use(cors());
+  
+        this.app.use(function(req: any, res: any, next: any) {
+            res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+            next();
+            //console.log(req);
         });
+        this.app.use('/', express.static(path.join(__dirname, '../dist/public')));
+    }
+
+    private createServer(): void {
+        this.server = http.createServer(this.app);
     }
 
     private sockets(): void {

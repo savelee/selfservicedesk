@@ -12,15 +12,13 @@
     "ng": "ng",
     "test": "ng test",
     "e2e": "ng e2e",
-    "start": "ng serve --proxy-config proxy.conf.json",
+    "watch": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build --prod",
     "compile-proto": "mkdir -p pbjs-genfiles && pbjs -p ./node_modules/google-proto-files google/cloud/dialogflow/v2beta1/session.proto -o ./pbjs-genfiles/proto.js -t static-module",
     "compile": "protoc -I=. ./node_modules/google-proto-files google/cloud/dialogflow/v2beta1/session.proto --js_out=import_style=commonjs:generated --grpc-web_out=import_style=commonjs,mode=grpcwebtext:generated"
   },
   "private": true,
   "dependencies": {
-    "@types/socket.io-client": "^1.4.32",
-    "@types/through2": "^2.0.34",
     "@angular/animations": "~8.2.14",
     "@angular/common": "~8.2.14",
     "@angular/compiler": "~8.2.14",
@@ -29,7 +27,10 @@
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
+    "@types/socket.io-client": "^1.4.32",
+    "@types/through2": "^2.0.34",
     "rxjs": "~6.5.3",
+    "socket.io-stream": "^0.9.1",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },
