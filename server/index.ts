@@ -39,6 +39,7 @@ export class App {
     private io: SocketIO.Server;
     
     constructor() {
+        console.log(ss);
         this.createApp();
         this.createServer();
         this.sockets();

@@ -31,7 +31,8 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "src/assets/recordrtc.min.js"
+              "src/assets/recordrtc.min.js",
+              "src/assets/socket.io-stream.js"
             ]
           },
           "configurations": {
