@@ -236,5 +236,7 @@ chatserver/tmp
 chatserver/_local
 
 # only check-in Typescript files
+
 *.js
 *.map
+!client/src/assets/*.js
