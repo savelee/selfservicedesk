@@ -49,14 +49,22 @@ export class Dialogflow {
       this.setupDialogflow();
   }
 
-/*
+ /*
   * Setup the Dialogflow Agent
   */
   public setupDialogflow() {
       this.sessionId = uuid.v4();
       this.sessionClient = new df.SessionsClient();
       this.sessionPath = this.sessionClient.sessionPath(this.projectId, this.sessionId);
-  
+
+      // Create the initial request object
+      // When streaming, this is the first call you will
+      // make, a request without the audio stream
+      // which prepares Dialogflow in receiving audio
+      // with a certain sampleRateHerz, encoding and languageCode
+      // this needs to be in line with the audio settings
+      // that are set in the client
+      
       this.request = {
         session: this.sessionPath,
         queryInput: {
@@ -70,10 +78,10 @@ export class Dialogflow {
       }
   }
 
-/*
+ /*
   * Detect Intent based on Audio
-  * @param audio
-  * @param cb Callback function to send results
+  * @param audio file buffer
+  * @param cb Callback function to execute with results
   */
   public async detectIntent(audio: any, cb:Function){
     this.request.inputAudio = audio;
@@ -83,16 +91,15 @@ export class Dialogflow {
     cb(this.getHandleResponses(responses));
   }
 
-/*
+ /*
   * Detect Intent based on Audio Stream
-  * @param audio
-  * @param cb Callback function to send results
+  * @param audio stream
+  * @param cb Callback function to execute with results
   */
   public async detectIntentStream(audio: any, cb:Function) { 
     const me = this;
     const stream = this.sessionClient.streamingDetectIntent()
       .on('data', function(data: any){
-        
         if (data.recognitionResult) {
           console.log(
             `Intermediate transcript:
@@ -100,8 +107,8 @@ export class Dialogflow {
           );
         } else {
             console.log(`Detected intent:`);
-            cb(data);
         }
+        cb(data);
       })
       .on('error', (e: any) => {
         console.log(e);

@@ -53,7 +53,7 @@ export class MicrophoneComponent implements OnInit {
           // reset the recorder
           // startRecording.disabled = false;
       });
-    
+
       // const startRecording = document.getElementById('start-recording');
       // const stopRecording = document.getElementById('stop-recording');
   }
@@ -62,8 +62,8 @@ export class MicrophoneComponent implements OnInit {
    // this.recordButton = <HTMLElement> document.querySelector(SELECTORS.MIC_RECORD_BUTTON);
     // this.startButton = <HTMLElement> document.querySelector(SELECTORS.START_RECORD_BUTTON);
     // this.stopButton = <HTMLElement> document.querySelector(SELECTORS.STOP_RECORD_BUTTON);
-    
-    //bthis.setupButtons();
+
+    // bthis.setupButtons();
     console.log(RecordRTC);
   }
 
@@ -113,9 +113,10 @@ export class MicrophoneComponent implements OnInit {
             timeSlice: 5000,
 
             // as soon as the stream is available
-            ondataavailable: function(blob) {
+            ondataavailable(blob) {
                 // making use of socket.io-stream for bi-directional
                 // streaming, create a stream
+                // tslint:disable-next-line:no-shadowed-variable
                 const stream = ss.createStream();
                 // stream directly to server
                 // it will be temp. stored locally
@@ -127,7 +128,6 @@ export class MicrophoneComponent implements OnInit {
                 ss.createBlobReadStream(blob).pipe(stream);
             }
         });
-        
 
         me.recordAudio.startRecording();
         // stopRecording.disabled = false;
@@ -136,7 +136,7 @@ export class MicrophoneComponent implements OnInit {
     });
   }
 
-  onStop(){
+  onStop() {
      // recording stopped
      // startRecording.disabled = false;
      // stopRecording.disabled = true;
@@ -147,7 +147,7 @@ export class MicrophoneComponent implements OnInit {
 
          // after stopping the audio, get the audio data
          me.recordAudio.getDataURL(function(audioDataURL) {
-             var files = {
+             let files = {
                  audio: {
                      type: me.recordAudio.getBlob().type || 'audio/wav',
                      dataURL: audioDataURL

@@ -239,4 +239,5 @@ chatserver/_local
 
 *.js
 *.map
+*.wav
 !client/src/assets/*.js

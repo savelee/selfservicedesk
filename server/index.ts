@@ -21,7 +21,6 @@ import { dialogflow } from './dialogflow';
 import * as socketIo from 'socket.io';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as url from 'url';
 import * as http from 'http';
 import * as express from 'express';
 import * as cors from 'cors';
@@ -37,9 +36,9 @@ export class App {
     private app: express.Application;
     private server: http.Server;
     private io: SocketIO.Server;
+    public socketClient: SocketIO.Server;
     
     constructor() {
-        console.log(ss);
         this.createApp();
         this.createServer();
         this.sockets();
@@ -73,19 +72,25 @@ export class App {
         });
 
         this.io.on('connect', (client: any) => {
+            this.socketClient = client;
             console.log(`Client connected [id=${client.id}]`);
             client.emit('server_setup', `Server connected [id=${client.id}]`);
 
-            client.on('message', function (data: any) {
-                //me.prepareAudioDetection(data.audio.dataURL);
+            client.on('message', function (results: any) {
+                //me.prepareAudioDetection(results.audio.dataURL);
+
+                client.emit('results', results);
             });
 
+            var me = this;
             ss(client).on('stream', function(stream: any, data: any) {
+                
                 var filename = path.basename(data.name);
                 stream.pipe(fs.createWriteStream(filename));
-
-                dialogflow.detectIntentStream(stream, function(result: any){
-                    console.log(result);
+                
+                dialogflow.detectIntentStream(stream, function(results: any){
+                    console.log(results);
+                    me.socketClient.emit('results', results);
                 });
             
                 stream.on('data', function(chunk: any){
