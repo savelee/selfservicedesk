@@ -232,12 +232,9 @@ testem.log
 .DS_Store
 Thumbs.db
 
-chatserver/tmp
-chatserver/_local
-
 # only check-in Typescript files
 
+*.wav
 *.js
 *.map
-*.wav
 !client/src/assets/*.js
