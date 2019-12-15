@@ -108,7 +108,7 @@ export class Dialogflow {
         } else {
             console.log(`Detected intent:`);
         }
-        cb(data);
+        cb(me.getHandleResponses(data));
       })
       .on('error', (e: any) => {
         console.log(e);
@@ -147,32 +147,26 @@ export class Dialogflow {
   * @param cb Callback function to send results
   */
   public getHandleResponses(responses: any): any {
-    const contextClient = new df.ContextsClient();
-    
-    if (Array.isArray(responses)) {
-      const result = responses[0].queryResult;
-      console.log(`  Query: ${result.queryText}`);
-      console.log(`  Response: ${result.fulfillmentText}`);
-      if (result.intent) {
-        console.log(`  Intent: ${result.intent.displayName}`);
-      } else {
-        console.log(`  No intent matched.`);
+    let json = {};
+    const result = responses.queryResult;
+
+    if (result && result.intent) {
+      const INTENT_NAME = result.intent.displayName;
+      const QUERY_TEXT = result.queryText;
+      const PARAMETERS = JSON.stringify(pb.struct.decode(result.parameters));
+      var PAYLOAD = "";
+      if(result.fulfillmentMessages[0] && result.fulfillmentMessages[0].payload){
+        PAYLOAD = JSON.stringify(pb.struct.decode(result.fulfillmentMessages[0].payload));
       }
-      const parameters = JSON.stringify(pb.struct.decode(result.parameters));
-      console.log(`  Parameters: ${parameters}`);
-      if (result.outputContexts && result.outputContexts.length) {
-        console.log(`  Output contexts:`);
-        result.outputContexts.forEach(function(context: any) {
-          const contextId = contextClient.matchContextFromContextName(context.name);
-          const contextParameters = JSON.stringify(
-            pb.struct.decode(context.parameters)
-          );
-          console.log(`    ${contextId}`);
-          console.log(`      lifespan: ${context.lifespanCount}`);
-          console.log(`      parameters: ${contextParameters}`);
-        });
-        return result;
-    }}
+      json = {
+        INTENT_NAME,
+        QUERY_TEXT,
+        PARAMETERS,
+        PAYLOAD
+      }
+      
+      return json;
+    }
     
   }
 }
