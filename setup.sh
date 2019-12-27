@@ -20,6 +20,7 @@ bold "Starting the setup process in project $PROJECT_ID..."
 bold "Enable APIs..."
 gcloud services enable \
   cloudbuild.googleapis.com \
+  run.googleapis.com \
   cloudtrace.googleapis.com \
   dialogflow.googleapis.com \
   logging.googleapis.com \

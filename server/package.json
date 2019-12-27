@@ -9,7 +9,7 @@
     "yarn": ">=1.17.3 <=1.19.1"
   },
   "scripts": {
-    "start": "node dist/api/index.js",
+    "start": "node dist/index.js",
     "watch": "nodemon --watch \"**/*.ts\" --exec \"ts-node\" index.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "build": "tsc -p .",

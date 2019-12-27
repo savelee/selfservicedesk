@@ -1,7 +1,7 @@
 <h2>Knowledge Base</h2>
   <p>Here's what we've found:</p>
   <div *ngFor="let f of fulfillment.FULFILLMENTS" class="card-container">
-    <div class="card card-small" (click)="selection.value = 'component'" tabindex="0">
+    <div class="card card-small" tabindex="0">
         <h3>{{f.QUESTION}}</h3>
         <div>
           {{f.ANSWER}}
