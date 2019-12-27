@@ -37,7 +37,6 @@ export class DialogflowComponent implements AfterViewInit {
   ngAfterViewInit() {
     let me = this;
     me.ioService.receiveStream('results', function(data) {
-      console.log('incoming data');
       me.fulfillmentService.setFulfillments(data);
     });
   }

@@ -17,9 +17,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { FulfillmentService } from '../services/fulfillment.service';
 import { IoService } from '../services/io.service';
-import { Fulfillment } from '../models/fulfillment.model';
 import { WaveformComponent } from '../waveform/waveform.component';
 
 declare const RecordRTC: any;
@@ -33,13 +31,10 @@ declare const StereoAudioRecorder: any;
 
 export class MicrophoneComponent {
     @Input() waveform: WaveformComponent;
-    public fullfillment: Fulfillment;
     public utterance: any;
     public recordAudio: any;
 
-    constructor(public fulfillmentService: FulfillmentService, public ioService: IoService) {
-
-      this.fullfillment = this.fulfillmentService.getFulfillment();
+    constructor(public ioService: IoService) {
     }
 
     /*

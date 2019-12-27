@@ -1,21 +1,10 @@
-import { Injectable} from '@angular/core';
 import { Fulfillment } from '../models/fulfillment.model';
-import { Observable, of } from 'rxjs';
 
-@Injectable({
-    // we declare that this service should be created
-    // by the root application injector.
-    providedIn: 'root',
-  })
 export class FulfillmentService {
     public fulfillment: Fulfillment;
     public matches: any;
-    connect(): Observable<Fulfillment> {
-        return of(this.fulfillment);
-    }
 
     constructor() {
-        console.log('reset');
         this.matches = [];
         this.fulfillment = {
             UTTERANCE: 'press record',
@@ -23,7 +12,7 @@ export class FulfillmentService {
         };
     }
     getFulfillment() {
-        console.log(this.fulfillment);
+        // console.log(this.fulfillment);
         return this.fulfillment;
     }
     setFulfillments(data) {

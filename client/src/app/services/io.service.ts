@@ -30,7 +30,7 @@ export class IoService {
       this.socket = this.socketio.on('connect', function() {
           console.log('connected');
       });
-      this.socket.binaryType = 'arraybuffer'; // TODO - does this work?
+      this.socket.binaryType = 'arraybuffer';
     }
 
     sendBinaryStream(blob: any) {

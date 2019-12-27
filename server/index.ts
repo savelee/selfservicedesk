@@ -77,9 +77,8 @@ export class App {
             client.emit('server_setup', `Server connected [id=${client.id}]`);
 
             client.on('message', function (results: any) {
-                //me.prepareAudioDetection(results.audio.dataURL);
-
-                client.emit('results', results);
+                // me.prepareAudioDetection(results.audio.dataURL);
+                // client.emit('results', results);
             });
 
             var me = this;
