@@ -31,5 +31,5 @@ RUN npm run-script build
 
 # Run the web service on container startup.
 
-EXPOSE 3000
+EXPOSE 8080
 CMD ["pm2-runtime", "/usr/src/app/dist/index.js"]
