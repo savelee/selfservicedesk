@@ -100,4 +100,18 @@ curl -X POST \
 -d $IMPORTFILES \
 https://dialogflow.googleapis.com/v2/projects/$PROJECT_ID/agent:import
 
+bold "Create a GKE cluster"
+gcloud container clusters create selfservicedesk \
+  --addons=HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
+  --machine-type=n1-standard-4 \
+  --enable-stackdriver-kubernetes \
+  --zone=europe-west4-a \
+  --scopes cloud-platform
+
+bold "Build the container"
+gcloud builds submit --tag gcr.io/$PROJECT_ID/selfservicedesk
+
+bold "Deploy to the cluster"
+gcloud run deploy --image gcr.io/$PROJECT_ID/selfservicedesk --platform gke --cluster selfservicedesk --cluster-location europe-west4-a --update-env-vars PROJECT_ID=$PROJECT_ID,LANGUAGE_CODE=en-US,ENCODING=AUDIO_ENCODING_LINEAR_16,SAMPLE_RATE_HERZ=16000,SINGLE_UTTERANCE=true
+
 bold "Setup & Deployment complete!"

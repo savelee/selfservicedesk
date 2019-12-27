@@ -6,10 +6,16 @@
 
 [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fsavelee%2Fselfservicedesk&cloudshell_tutorial=TUTORIAL.md)
 
+Airport SelfServiceDesk demo, to demonstrate how microphone streaming to GCP works, from a web application.
+
+In this demo, you can start recording your voice, it will display answers on a screen.
 
 # Setup Local Environment
 
-1. Set the project ID: export PROJECT_ID=[gcp-project-id]
+These steps will deploy a Node JS application with a Angular client, to a cluster with **Cloud Run for Anthos**.
+It will also deploy a Dialogflow Agent, for intent matching.
+
+1. Set the PROJECT_ID variable: export PROJECT_ID=[gcp-project-id]
 
 1. Set the project: `gcloud config set project $PROJECT_ID`
 
@@ -45,15 +51,17 @@
 
 2. Build the client-side Angular app:
     
-    `cd client`
-    `npm install`
-    `npm run-script build`
+    ```
+    cd client && npm install
+    npm run-script build
+    ```
 
 3. Start the server Typescript app, which is exposed on port 8080:
 
-    `cd ../server`
-    `npm install`
-    `npm run-script watch`
+    ```
+    cd ../server && npm install
+    npm run-script watch
+    ```
 
 4. Browse to http://localhost:8080
 
@@ -63,7 +71,7 @@
 
 1. Zip the contents of the *dialogflow* folder, from this repo.
 
-1. Click **settings**, **Import**, and upload the dialogflow agent zip, you just created.
+1. Click **settings**, **Import**, and upload the Dialogflow agent zip, you just created.
 
 ## Deploy with Cloud Run
 
@@ -73,7 +81,7 @@ We will deploy it as containers in Anthos:
 
 1. Run this command to create a cluster:
 
-`gcloud container clusters create selfservicedesk \
+    `gcloud container clusters create selfservicedesk \
   --addons=HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
   --machine-type=n1-standard-4 \
   --enable-stackdriver-kubernetes \
@@ -86,5 +94,5 @@ We will deploy it as containers in Anthos:
 
 1. Run this command to deploy to the cluster:
 
-    `gcloud run deploy --image gcr.io/$PROJECT_ID/selfservicedesk --platform gke --cluster selfservicedesk --cluster-location europe-west4-a --update-env-vars PROJECT_ID=$PROJECT_ID,LANGUAGE_CODE=en-US,ENCODING=AUDIO_ENCODING_LINEAR_16,SAMPLE_RATE_HERZ=16000,SINGLE_UTTERANCEE=true`
+    `gcloud run deploy --image gcr.io/$PROJECT_ID/selfservicedesk --platform gke --cluster selfservicedesk --cluster-location europe-west4-a --update-env-vars PROJECT_ID=$PROJECT_ID,LANGUAGE_CODE=en-US,ENCODING=AUDIO_ENCODING_LINEAR_16,SAMPLE_RATE_HERZ=16000,SINGLE_UTTERANCE=true`
 
