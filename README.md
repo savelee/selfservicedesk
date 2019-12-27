@@ -26,25 +26,65 @@
 
 1. Open **env.txt**, change the environment variables and rename the file to **.env**
 
-1. Build the client-side Angular app:
+1. Enable APIs:
+
+ ```
+  gcloud services enable \
+  container.googleapis.com \ 
+  containerregistry.googleapis.com \
+  cloudbuild.googleapis.com \
+  run.googleapis.com \
+  cloudtrace.googleapis.com \
+  dialogflow.googleapis.com \
+  logging.googleapis.com \
+  dns.googleapis.com \
+  monitoring.googleapis.com \
+  sourcerepo.googleapis.com \
+  translate.googleapis.com
+```
+
+2. Build the client-side Angular app:
     
     `cd client`
     `npm install`
     `npm run-script build`
 
-1. Start the server Typescript app, which is exposed on port 3000:
+3. Start the server Typescript app, which is exposed on port 8080:
 
     `cd ../server`
     `npm install`
     `npm run-script watch`
 
-1. Browse to http://localhost:3000
+4. Browse to http://localhost:8080
+
+## Setup Dialogflow
+
+1. Create a Dialogflow agent at: http://console.dialogflow.com
+
+1. Zip the contents of the *dialogflow* folder, from this repo.
+
+1. Click **settings**, **Import**, and upload the dialogflow agent zip, you just created.
 
 ## Deploy with Cloud Run
 
-1. Run these commands from the root of the project:
+This application makes heavy use of websockets,
+therefore you can't use the Cloud Run Managed Platform.
+We will deploy it as containers in Anthos:
+
+1. Run this command to create a cluster:
+
+`gcloud container clusters create selfservicedesk \
+  --addons=HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
+  --machine-type=n1-standard-4 \
+  --enable-stackdriver-kubernetes \
+  --zone=europe-west4-a \
+  --scopes cloud-platform`
+
+1. Run this command to build the container:
    
     `gcloud builds submit --tag gcr.io/$PROJECT_ID/selfservicedesk`
 
-    `gcloud run deploy --image gcr.io/$PROJECT_ID/selfservicedesk --platform managed`
+1. Run this command to deploy to the cluster:
+
+    `gcloud run deploy --image gcr.io/$PROJECT_ID/selfservicedesk --platform gke --cluster selfservicedesk --cluster-location europe-west4-a --update-env-vars PROJECT_ID=$PROJECT_ID,LANGUAGE_CODE=en-US,ENCODING=AUDIO_ENCODING_LINEAR_16,SAMPLE_RATE_HERZ=16000,SINGLE_UTTERANCEE=true`
 

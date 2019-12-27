@@ -32,7 +32,7 @@ dotenv.config();
 sourceMapSupport.install();
 
 export class App {
-    public static readonly PORT:number = parseInt(process.env.PORT) || 9001;
+    public static readonly PORT:number = parseInt(process.env.PORT) || 8080;
     private app: express.Application;
     private server: http.Server;
     private io: SocketIO.Server;

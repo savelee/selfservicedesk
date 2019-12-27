@@ -27,9 +27,9 @@ RUN npm run-script build
 
 WORKDIR /usr/src/app/server
 RUN npm install
+RUN npm install pm2 -g
 RUN npm run-script build
 
 # Run the web service on container startup.
 
-EXPOSE 8080
-CMD ["pm2-runtime", "/usr/src/app/dist/index.js"]
+CMD ["pm2-runtime", "/usr/src/app/server/index.js"]

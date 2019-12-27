@@ -19,6 +19,8 @@ set -a
 bold "Starting the setup process in project $PROJECT_ID..."
 bold "Enable APIs..."
 gcloud services enable \
+  container.googleapis.com \ 
+  containerregistry.googleapis.com \
   cloudbuild.googleapis.com \
   run.googleapis.com \
   cloudtrace.googleapis.com \
@@ -28,6 +30,7 @@ gcloud services enable \
   monitoring.googleapis.com \
   sourcerepo.googleapis.com \
   translate.googleapis.com
+
 
 bold "Creating a service account $SERVICE_ACCOUNT_NAME..."
 
