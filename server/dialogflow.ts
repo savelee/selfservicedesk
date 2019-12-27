@@ -15,12 +15,9 @@
  * limitations under the License.
  * =============================================================================
  */
-
-
 import * as dotenv from 'dotenv';
 import * as uuid from 'uuid';
 import * as pb from 'pb-util';
-import * as fs from 'fs';
 
 const util = require('util');
 const { Transform, pipeline } = require('stream');
@@ -45,7 +42,7 @@ export class Dialogflow {
       this.projectId = process.env.PROJECT_ID;
       this.encoding = process.env.ENCODING;
       this.singleUtterance = ((process.env.SINGLE_UTTERANCE == 'true') || true);
-      this.sampleRateHertz = (parseInt(process.env.SAMPLE_HERZ) || 44100);
+      this.sampleRateHertz = parseInt(process.env.SAMPLE_RATE_HERZ);
       this.setupDialogflow();
   }
 
@@ -101,14 +98,12 @@ export class Dialogflow {
     const stream = this.sessionClient.streamingDetectIntent()
       .on('data', function(data: any){
         if (data.recognitionResult) {
-          console.log(
-            `Intermediate transcript:
-            ${data.recognitionResult.transcript}`
-          );
+          cb({
+            UTTERANCE: data.recognitionResult.transcript
+          });
         } else {
-            console.log(`Detected intent:`);
+          cb(me.getHandleResponses(data));   
         }
-        cb(me.getHandleResponses(data));
       })
       .on('error', (e: any) => {
         console.log(e);
@@ -151,9 +146,10 @@ export class Dialogflow {
     const result = responses.queryResult;
 
     if (result && result.intent) {
+      console.log(result);
       const INTENT_NAME = result.intent.displayName;
-      const QUERY_TEXT = result.queryText;
       const PARAMETERS = JSON.stringify(pb.struct.decode(result.parameters));
+      const QUERY_TEXT = result.fulfillmentText;
       var PAYLOAD = "";
       if(result.fulfillmentMessages[0] && result.fulfillmentMessages[0].payload){
         PAYLOAD = JSON.stringify(pb.struct.decode(result.fulfillmentMessages[0].payload));

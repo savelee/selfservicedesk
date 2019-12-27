@@ -1,14 +1,10 @@
 <h2>Knowledge Base</h2>
-  <p>Here's what we found:</p>
-
-  <input type="hidden" #selection>
-
-  <div *ngFor="let fulfillment of fulfillments" class="card-container">
+  <p>Here's what we've found:</p>
+  <div *ngFor="let f of fulfillment.FULFILLMENTS" class="card-container">
     <div class="card card-small" (click)="selection.value = 'component'" tabindex="0">
-        <h3>{{fulfillment.QUESTION}}</h3>
-        <small>{{fulfillment.QUERY_TEXT}}</small>
+        <h3>{{f.QUESTION}}</h3>
         <div>
-          {{fulfillment.ANSWER}}
+          {{f.ANSWER}}
         </div>
     </div>
   </div>

@@ -1,26 +1,47 @@
-<div class="toolbar" role="banner">
-  <img
-    height="30"
-    alt="Dialogflow Logo"
-    src="../assets/dialogflowlogo.svg"
-  />
-  <span>Self Service Desk Demo</span>
-  <div class="spacer"></div>
-  Language: EN
-  <div class="spacer"></div>
-</div>
+
 
 <div class="wrapper">
-
-  <div class="side flexcontainer" role="side">
-      <app-microphone></app-microphone>
+  <div class="flex-grid toolbar" role="banner">
+    <div class="col">
+      <img
+      height="30"
+      alt="Dialogflow Logo"
+      src="../assets/dialogflowlogo.svg"
+    />
+    </div>
+    <div class="col"><span>Self Service Desk Demo</span></div>
+    <div class="col">Language: EN</div>
   </div>
 
-  <div class="content flexcontainer" role="main">
+  <div class="flex-grid-parts">
     <div class="inner">
-      <app-dialogflow></app-dialogflow>
+      <div class="col side">
+        <app-microphone [waveform]="waveform"></app-microphone>
+        <app-waveform #waveform></app-waveform>
+
+        <br/>
+        You can ask the following:
+        <ul>
+            <li>What time is boarding?</li>
+            <li>How do I go through security as fast as possible?</li>
+            <li>Can my suitcase be opened at the airport?</li>
+            <li>I smoke, can I take my lighter in my hand baggage?</li>
+            <li>When should I plan to arrive at the airport?</li>
+        </ul>
+      </div>
+      <div class="col content">
+        <app-dialogflow></app-dialogflow>
+      </div>
     </div>
   </div>
 
+  <div class="flex-grid footer">
+    <div class="col">2020 Lee Boonstra, Developer Advocate, Google Cloud</div>
+    <div class="col"></div>
+    <div class="col link"><a href="http://www.github.com/savelee/selfservicedesk">Preview this code, it's on Github</a></div>
+  </div>
 </div>
+
 <router-outlet></router-outlet>
+
+

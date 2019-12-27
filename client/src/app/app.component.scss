@@ -1,7 +1,66 @@
-.flexcontainer {
-  display: -webkit-inline-flex;
-  display: inline-flex;
+@media (max-width: 400px) {
+  .flex-grid,
+  .flex-grid-parts {
+    display: block;
+    .col {
+      width: 100%;
+      margin: 0 0 10px 0;
+    }
+  }
+}
+
+body {
+  padding: 20px;
+}
+.flex-grid { 
+  margin: 0 0 20px 0;
+  flex: none;
+}
+.col {
+  padding: 20px;
+}
+
+.flex-grid {
+  display: flex;
+}
+.flex-grid .col {
+  flex: 1;
+}
+
+.wrapper {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  
+  justify-content: flex-start; /* align items in Main Axis */
+  align-items: stretch; /* align items in Cross Axis */
+  align-content: stretch; /* Extra space in Cross Axis */
+}
+
+.inner {
+  flex: 1;
+  overflow: auto; 
+  display: flex;
+}
+
+.flex-grid-parts { 
+  flex: 1;
+  justify-content: space-between;
+  margin: 0 0 20px 0;
+  display: flex;
   flex-direction: row;
+  justify-content: flex-start; /* align items in Main Axis */
+  align-items: stretch; /* align items in Cross Axis */
+  align-content: stretch; /* Extra space in Cross Axis */
+
+}
+.flex-grid-parts .col.side {
+  width: 450px;
+}
+.flex-grid-parts .col {
+  width: 75%;
 }
 
 :host {
@@ -32,7 +91,6 @@ p {
 
 .toolbar {
   height: 60px;
-  margin: -8px;
   display: flex;
   align-items: center;
   background-color: #fff;
@@ -40,25 +98,6 @@ p {
   font-weight: 600;
   -webkit-box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15);
   box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15);
-}
-
-.toolbar img {
-  margin: 0 16px;
-}
-
-.inner {
-  width: 660px;
-}
-
-.side {
-  margin: 32px auto;
-  padding: 0 16px;
-  min-width: 100px;
-}
-
-.content {
-  margin: 32px auto;
-  padding: 0 16px;
 }
 
 a,
@@ -80,3 +119,12 @@ svg#clouds {
   width: 1920px;
 }
 
+.footer {
+  font-size: 80%;
+  color: #333;
+  margin: 0;
+}
+
+.link {
+  text-align: right;
+}

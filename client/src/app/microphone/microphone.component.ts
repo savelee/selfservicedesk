@@ -16,22 +16,14 @@
  * =============================================================================
  */
 
-import { Component, OnInit } from '@angular/core';
-import { addClass, addMultipleEventListener } from '../helpers/helpers';
-import { HttpClient } from '@angular/common/http';
-import { convertFloat32ToInt16 } from '../helpers/helpers';
-import * as io from 'socket.io-client';
+import { Component, Input } from '@angular/core';
+import { FulfillmentService } from '../services/fulfillment.service';
+import { IoService } from '../services/io.service';
+import { Fulfillment } from '../models/fulfillment.model';
+import { WaveformComponent } from '../waveform/waveform.component';
 
 declare const RecordRTC: any;
 declare const StereoAudioRecorder: any;
-declare const ss: any;
-
-const SELECTORS = {
-  AUDIO_ELEMENT: '.audio_element',
-  MIC_RECORD_BUTTON: '.mic_button',
-  START_RECORD_BUTTON: '.start_btn',
-  STOP_RECORD_BUTTON: '.stop_btn',
-};
 
 @Component({
   selector: 'app-microphone',
@@ -39,123 +31,104 @@ const SELECTORS = {
   styleUrls: ['./microphone.component.scss']
 })
 
-/** Initializes and manages interaction with the camera */
-export class MicrophoneComponent implements OnInit {
+export class MicrophoneComponent {
+    @Input() waveform: WaveformComponent;
+    public fullfillment: Fulfillment;
+    public utterance: any;
     public recordAudio: any;
-    socket: any;
-    socketio: any;
 
-    constructor(private http: HttpClient) {
-      this.http = http;
+    constructor(public fulfillmentService: FulfillmentService, public ioService: IoService) {
 
-      this.socketio = io();
-      this.socket = this.socketio.on('connect', function() {
-          // reset the recorder
-          // startRecording.disabled = false;
+      this.fullfillment = this.fulfillmentService.getFulfillment();
+    }
+
+    /*
+    setupButtons() {
+      let me = this;
+
+      addMultipleEventListener(this.recordButton,
+        ['touchstart', 'mousedown'], async function(e: Event) {
+          e.preventDefault();
+
       });
+      addMultipleEventListener(this.recordButton,
+        ['touchend', 'mouseup'], function(e: Event) {
+          e.preventDefault();
+      });
+      addMultipleEventListener(this.recordButton,
+        ['touchcancel', 'touchmove'], function(e: Event) {
+          e.preventDefault();
+      });
+    }*/
 
-      // const startRecording = document.getElementById('start-recording');
-      // const stopRecording = document.getElementById('stop-recording');
-  }
+    onStart() {
+      // recording started
+      // startRecording.disabled = true;
+      let me = this;
+      // make use of HTML 5/WebRTC, JavaScript getUserMedia()
+      // to capture the browser microphone stream
+      navigator.getUserMedia({
+          audio: true
+      }, function(stream: MediaStream) {
+          me.waveform.start(stream);
+          me.recordAudio = RecordRTC(stream, {
+              type: 'audio',
+              mimeType: 'audio/webm',
+              sampleRate: 44100, // this sampleRate should be the same in your server code
 
-  ngOnInit() {
-   // this.recordButton = <HTMLElement> document.querySelector(SELECTORS.MIC_RECORD_BUTTON);
-    // this.startButton = <HTMLElement> document.querySelector(SELECTORS.START_RECORD_BUTTON);
-    // this.stopButton = <HTMLElement> document.querySelector(SELECTORS.STOP_RECORD_BUTTON);
+              // MediaStreamRecorder, StereoAudioRecorder, WebAssemblyRecorder
+              // CanvasRecorder, GifRecorder, WhammyRecorder
+              recorderType: StereoAudioRecorder,
 
-    // bthis.setupButtons();
-    console.log(RecordRTC);
-  }
+              // Dialogflow / STT requires mono audio
+              numberOfAudioChannels: 1,
 
-  /*
-  setupButtons() {
-    let me = this;
+              // get intervals based blobs
+              // value in milliseconds
+              // as you might not want to make detect calls every seconds
+              timeSlice: 3000,
 
-    addMultipleEventListener(this.recordButton,
-      ['touchstart', 'mousedown'], async function(e: Event) {
-        e.preventDefault();
+              // only for audio track
+              audioBitsPerSecond: 128000,
 
-    });
-    addMultipleEventListener(this.recordButton,
-      ['touchend', 'mouseup'], function(e: Event) {
-        e.preventDefault();
-    });
-    addMultipleEventListener(this.recordButton,
-      ['touchcancel', 'touchmove'], function(e: Event) {
-        e.preventDefault();
-    });
-  }*/
+              // used by StereoAudioRecorder
+              // the range 22050 to 96000.
+              // let us force 16khz recording:
+              desiredSampRate: 16000,
 
-  onStart() {
-    // recording started
-    // startRecording.disabled = true;
-    let me = this;
-    // make use of HTML 5/WebRTC, JavaScript getUserMedia()
-    // to capture the browser microphone stream
-    navigator.getUserMedia({
-        audio: true
-    }, function(stream) {
-        me.recordAudio = RecordRTC(stream, {
-            type: 'audio',
-            mimeType: 'audio/webm',
-            sampleRate: 44100, // this sampleRate should be the same in your server code
+              // as soon as the stream is available
+              ondataavailable(blob) {
+                me.ioService.sendBinaryStream(blob);
+              }
+          });
 
-            // MediaStreamRecorder, StereoAudioRecorder, WebAssemblyRecorder
-            // CanvasRecorder, GifRecorder, WhammyRecorder
-            recorderType: StereoAudioRecorder,
+          me.recordAudio.startRecording();
+          // stopRecording.disabled = false;
+      }, function(error) {
+          console.error(JSON.stringify(error));
+      });
+    }
 
-            // Dialogflow / STT requires mono audio
-            numberOfAudioChannels: 1,
+    onStop() {
+      // recording stopped
+      // startRecording.disabled = false;
+      // stopRecording.disabled = true;
 
-            // get intervals based blobs
-            // value in milliseconds
-            // as you might not want to make detect calls every seconds
-            timeSlice: 5000,
-
-            // as soon as the stream is available
-            ondataavailable(blob) {
-                // making use of socket.io-stream for bi-directional
-                // streaming, create a stream
-                // tslint:disable-next-line:no-shadowed-variable
-                const stream = ss.createStream();
-                // stream directly to server
-                // it will be temp. stored locally
-                ss(me.socket).emit('stream', stream, {
-                    name: '../_temp/stream.wav',
-                    size: blob.size
-                });
-                // pipe the audio blob to the read stream
-                ss.createBlobReadStream(blob).pipe(stream);
-            }
-        });
-
-        me.recordAudio.startRecording();
-        // stopRecording.disabled = false;
-    }, function(error) {
-        console.error(JSON.stringify(error));
-    });
-  }
-
-  onStop() {
-     // recording stopped
-     // startRecording.disabled = false;
-     // stopRecording.disabled = true;
-
-     // stop audio recorder
-     let me = this;
-     this.recordAudio.stopRecording(function() {
-
-         // after stopping the audio, get the audio data
-         me.recordAudio.getDataURL(function(audioDataURL) {
-             let files = {
-                 audio: {
-                     type: me.recordAudio.getBlob().type || 'audio/wav',
-                     dataURL: audioDataURL
-                 }
-             };
-             // submit the audio file to the server
-             me.socketio.emit('message', files);
-         });
-     });
-  }
+      // stop audio recorder
+      let me = this;
+      me.waveform.stop();
+      this.recordAudio.stopRecording(function() {
+          // after stopping the audio, get the audio data
+          me.recordAudio.getDataURL(function(audioDataURL) {
+              let files = {
+                  audio: {
+                      type: me.recordAudio.getBlob().type || 'audio/wav',
+                      dataURL: audioDataURL
+                  }
+              };
+              // submit the audio file to the server
+              me.ioService.sendMessage('message', files);
+          });
+      });
+    }
 }

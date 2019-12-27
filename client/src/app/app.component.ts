@@ -17,7 +17,6 @@
  */
 
 import { Component } from '@angular/core';
-import * as io from 'socket.io-client';
 
 @Component({
   selector: 'app-root',
@@ -25,62 +24,5 @@ import * as io from 'socket.io-client';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  private socket: any;
-
-  constructor() {
-    this.listen();
-    this.speak();
-  }
-
-  /**
-   * Listen to Websockets
-   */
-  listen() {
-    this.socket = io();
-    this.socket.binaryType = 'arraybuffer';
-
-    this.socket.on('connect', function() {
-      console.log('socket connection made');
-    });
-    this.socket.on('disconnect', function() {
-      console.log('sockets disconnected');
-    });
-
-    this.socket.on('server_setup', function(msg) {
-      console.log(msg);
-    });
-
-    this.socket.on('broadcast', function(audioBuffer: any) {
-      // retrieve audio stream from dialogflow to play
-
-      console.log('=PLAY=============================');
-      console.log(audioBuffer);
-    });
-  }
-  /*
-  * Start conversation with Dialogflow SDK
-  */
-  async speak() {
-      let me = this;
-      window.addEventListener('mic_start', function(e: CustomEvent) {
-        let meta = e.detail;
-        meta.socket = me.socket.id;
-        me.socket.emit('client_meta', meta);
-        console.log(meta);
-      });
-      window.addEventListener('mic_stop', function(e: CustomEvent) {
-          me.socket.emit('stop');
-      });
-      window.addEventListener('mic_rec', function(e: CustomEvent) {
-          let audio = e.detail; // ArrayBuffer
-          console.log(audio);
-          // socket.io binary
-          // me.socket.on('returnaudio', function(audioObj: any) {
-              // console.log('Client connected over WebSockets');
-          // });
-
-          // send mic audio to server
-          me.socket.emit('client_audio', audio);
-      });
-  }
+  title = 'SelfServiceDesk';
 }

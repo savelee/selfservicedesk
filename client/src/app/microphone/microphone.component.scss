@@ -1,3 +1,36 @@
+.flexcontainer {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    .box {
+      align-self: stretch;
+      flex: 50%;
+    }
+    .mic {
+        width: 500px;
+        align-self: stretch;
+    }
+
+}
+
+.wrapper {
+    margin-top: 20px;
+    position: relative;
+}
+.utterance {
+    position: absolute;
+    top: 70px;
+    color: #fff;
+    width: 450px;
+    text-align: center;
+    left: 0;
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+}
+
 .card.highlight-card {
     background-color: #ef6c00;
     color: white;
