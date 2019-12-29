@@ -97,39 +97,49 @@ We will deploy it as containers in Anthos:
 **NOTE: Currently, I can't get Cloud Run for Anthos
 working on port 443.**
 
-1. Run this command to build the container:
+1. `export PROJECT_ID=[your-project-id]`
+
+1. First build your container, and run this command:
    
     `gcloud builds submit --tag gcr.io/$PROJECT_ID/selfservicedesk`
 
 1. Run these commands to set defaults:
 
     ```
-    gcloud config set compute/zone europe-west1-b && gcloud config set run/platform gke && gcloud config set run/cluster selfservicedesk && gcloud config set run/cluster_location europe-west1-b
+    gcloud config set compute/zone europe-west1-b && gcloud config set run/platform gke && gcloud config set run/cluster selfservicedesk && gcloud config set run/cluster_location europe-west1
     ```
 
 1. Run this command to create a cluster:
 
     ```
-    gcloud beta container clusters create selfservicedesk \
-    --addons=HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
-    --machine-type=n1-standard-2 \
-    --num-nodes=3 \
-    --cluster-version=1.14.7-gke.23 \
-    --enable-stackdriver-kubernetes
+    gcloud beta container --project $PROJECT_ID clusters create "selfservicedesk" --region "europe-west1" --no-enable-basic-auth --cluster-version "1.13.11-gke.14" --machine-type "n1-standard-2" --image-type "COS" --disk-type "pd-standard" --disk-size "100" --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" --num-nodes "3" --enable-stackdriver-kubernetes --enable-ip-alias --network "projects/selfservicedesk/global/networks/default" --subnetwork "projects/selfservicedesk/regions/europe-west1/subnetworks/default" --default-max-pods-per-node "110" --addons HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun --enable-autoupgrade --enable-autorepair
     ```
 
     You will get a result something like this:
 
-    *selfservicedesk  europe-west1-b  1.14.7-gke.23   34.76.247.19  n1-standard-2  1.14.7-gke.23  3          RUNNING*
+    *selfservicedesk  europe-west1  1.13.11-gke.14  35.195.243.241  n1-standard-2  1.13.11-gke.14  9          RUNNING*
+
+1. Run this command to deploy to the cluster:
+
+    ** I have to create this through the console,
+    since the below command gives me problems. **
+
+    *Service does not have any ready Revision.*
+
+    * Select your image
+    * Cloud Run for Anthos
+    * Add these environment vars:
+
+        LANGUAGE_CODE=en-US
+        ENCODING=AUDIO_ENCODING_LINEAR_16
+        SAMPLE_RATE_HERZ=16000
+        SINGLE_UTTERANCE=true
+        PROJECT_ID=[your-project-id]
 
 1.  Configure the URL:
 
     `kubectl patch configmap config-domain --namespace knative-serving --patch \
 '{"data": {"example.com": null, "[YOUR-DOMAIN]": ""}}'`
-
-1. Run this command to deploy to the cluster:
-
-    `gcloud run deploy selfservicedesk --image gcr.io/selfservicedesk/selfservicedesk@sha256:dc5d554279f744b257829eb7b398568077b7cb9494da6638e9932e9df325c5b2 --platform gke --cluster selfservicedesk --cluster-location europe-west1-b --update-env-vars PROJECT_ID=selfservicedesk,LANGUAGE_CODE=en-US,ENCODING=AUDIO_ENCODING_LINEAR_16,SAMPLE_RATE_HERZ=16000,SINGLE_UTTERANCE=true`
 
 1. Since this is not the Cloud Run managed platform, I have to map the URL to a custom domain:
 
@@ -195,7 +205,15 @@ chmod a+x ./certbot-auto
         privateKey: /etc/istio/ingressgateway-certs/tls.key
         serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
     ```
+
+    and then I get this error:
+    curl: (7) Failed to connect to selfservicedesk.cloudtricks.eu port 443: Connection refused
+
 -------------------------------- 
+
+GARBAGE - TESTING since I can't get HTTPS to work on my cluster
+
+
 and now i have no idea
 how to add the tls
 
