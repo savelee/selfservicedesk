@@ -13,9 +13,7 @@
     "test": "ng test",
     "e2e": "ng e2e",
     "watch": "ng serve --proxy-config proxy.conf.json",
-    "build": "ng build --prod",
-    "compile-proto": "mkdir -p pbjs-genfiles && pbjs -p ./node_modules/google-proto-files google/cloud/dialogflow/v2beta1/session.proto -o ./pbjs-genfiles/proto.js -t static-module",
-    "compile": "protoc -I=. ./node_modules/google-proto-files google/cloud/dialogflow/v2beta1/session.proto --js_out=import_style=commonjs:generated --grpc-web_out=import_style=commonjs,mode=grpcwebtext:generated"
+    "build": "ng build --prod"
   },
   "private": true,
   "dependencies": {

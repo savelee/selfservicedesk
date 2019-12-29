@@ -48,11 +48,19 @@ export class App {
     private createApp(): void {
         this.app = express();
         this.app.use(cors());
+        this.app.set('trust proxy', true);
   
         this.app.use(function(req: any, res: any, next: any) {
             res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-            next();
-            //console.log(req);
+
+            if (req.secure) {
+                // request was via https, so do no special handling
+                next();
+            } else {
+                    // request was via http, so redirect to https
+                    res.redirect('https://' + req.headers.host + req.url);
+            }
+
         });
         this.app.use('/', express.static(path.join(__dirname, '../dist/public')));
     }

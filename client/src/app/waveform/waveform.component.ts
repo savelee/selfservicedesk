@@ -47,6 +47,7 @@ export class WaveformComponent implements OnInit {
     }
 
     public start(stream: MediaStream) {
+        console.log(stream);
         this.canvasCtx = (<HTMLCanvasElement> this.canvas.nativeElement).getContext('2d');
         this.source = this.audioCtx.createMediaStreamSource(stream);
         this.source.connect(this.analyser);
@@ -63,6 +64,7 @@ export class WaveformComponent implements OnInit {
     }
 
     visualize() {
+        console.log('visualize');
         let me = this;
         let width = (<HTMLCanvasElement> this.canvas.nativeElement).width;
         let height = (<HTMLCanvasElement> this.canvas.nativeElement).height;
