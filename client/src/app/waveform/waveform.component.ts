@@ -32,7 +32,7 @@ export class WaveformComponent implements OnInit {
     public fulfillment: Fulfillment;
     public source: MediaStreamAudioSourceNode;
     public audioCtx: AudioContext;
-    public distortion: WaveShaperNode;
+    // public distortion: WaveShaperNode;
     public analyser: AnalyserNode;
     public myReq: number;
 
@@ -40,35 +40,35 @@ export class WaveformComponent implements OnInit {
         this.fulfillment = this.fulfillmentService.getFulfillment();
     }
 
-    ngOnInit() {
-        this.audioCtx = new AudioContext();
-        this.analyser = this.audioCtx.createAnalyser();
-        this.distortion = this.audioCtx.createWaveShaper();
-    }
+    ngOnInit() {}
 
     public start(stream: MediaStream) {
-        console.log(stream);
+        this.audioCtx = new AudioContext();
+        this.analyser = this.audioCtx.createAnalyser();
+        // this.distortion = this.audioCtx.createWaveShaper();
+
         this.canvasCtx = (<HTMLCanvasElement> this.canvas.nativeElement).getContext('2d');
+
         this.source = this.audioCtx.createMediaStreamSource(stream);
         this.source.connect(this.analyser);
-        this.analyser.connect(this.distortion);
-        this.distortion.connect(this.audioCtx.destination);
+        this.analyser.connect(this.audioCtx.destination);
+        // this.analyser.connect(this.distortion);
+        // this.distortion.connect(this.audioCtx.destination);
         this.visualize();
     }
 
     public stop() {
         this.source.disconnect(this.analyser);
-        this.analyser.disconnect(this.distortion);
-        this.distortion.disconnect(this.audioCtx.destination);
+        this.analyser.disconnect(this.audioCtx.destination);
+        // this.distortion.disconnect(this.audioCtx.destination);
         cancelAnimationFrame(this.myReq);
     }
 
     visualize() {
-        console.log('visualize');
         let me = this;
-        let width = (<HTMLCanvasElement> this.canvas.nativeElement).width;
-        let height = (<HTMLCanvasElement> this.canvas.nativeElement).height;
-        let bufferLength = this.analyser.frequencyBinCount;
+        let width = (<HTMLCanvasElement> me.canvas.nativeElement).width;
+        let height = (<HTMLCanvasElement> me.canvas.nativeElement).height;
+        let bufferLength = me.analyser.frequencyBinCount;
         let dataArray = new Uint8Array(bufferLength);
         me.analyser.fftSize = 2048;
         me.canvasCtx.clearRect(0, 0, width, height);
@@ -78,7 +78,7 @@ export class WaveformComponent implements OnInit {
             me.analyser.getByteTimeDomainData(dataArray);
             me.canvasCtx.fillStyle = 'rgb(255, 165, 0)';
             me.canvasCtx.fillRect(0, 0, width, height);
-            me.canvasCtx.lineWidth = 5;
+            me.canvasCtx.lineWidth = 4;
             me.canvasCtx.strokeStyle = 'rgb(256, 256, 256)';
             me.canvasCtx.beginPath();
             let sliceWidth = width * 1.0 / bufferLength;

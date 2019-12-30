@@ -7,6 +7,17 @@
       margin: 0 0 10px 0;
     }
   }
+
+  .title, ul.suggestions, span.text {
+    display: none !important;
+  }
+
+  .flex-grid-parts .col.side {
+    width: 50px !important;
+  }
+  .flex-grid-parts .col {
+    width: 90% !important;
+  }
 }
 
 body {
@@ -18,6 +29,9 @@ body {
 }
 .col {
   padding: 20px;
+}
+.langpick {
+  text-align: right;
 }
 
 .flex-grid {

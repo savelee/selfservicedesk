@@ -39,7 +39,6 @@ export class Dialogflow {
     
   constructor() {
       this.languageCode = process.env.LANGUAGE_CODE;
-      console.log(this.languageCode);
       this.projectId = process.env.PROJECT_ID;
       this.encoding = process.env.ENCODING;
       this.singleUtterance = ((process.env.SINGLE_UTTERANCE == 'true') || true);

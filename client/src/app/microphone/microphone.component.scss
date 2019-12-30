@@ -1,24 +1,14 @@
-.flexcontainer {
-    display: flex;
-    align-items: stretch;
-    justify-content: space-between;
-    margin-top: 20px;
-
-    .box {
-      align-self: stretch;
-      flex: 50%;
-    }
-    .mic {
-        width: 500px;
-        align-self: stretch;
+@media (max-width: 400px) {
+    .start_btn span,
+    .stop_btn span {
+        display: none;
     }
 
+    button {
+        margin: -20px 5px 22px -5px !important;
+    }
 }
 
-.wrapper {
-    margin-top: 20px;
-    position: relative;
-}
 .utterance {
     position: absolute;
     top: 70px;
@@ -41,8 +31,6 @@
   }
 .card.highlight-card svg {
     fill: white;
-    position: relative;
-    top: 5px;
 }
 .card.card.highlight-card span {
     margin-left: 10px;
@@ -52,6 +40,18 @@
     text-decoration: none;
     background-color: #d26105;
 }
+
+.start_btn, .stop_btn {
+    margin: 0 5px 0 0;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.start_btn:disabled,
+.stop_btn:disabled {
+    background-color: #d26105;  
+}
+
 
 hr {
     margin: 0 100px;

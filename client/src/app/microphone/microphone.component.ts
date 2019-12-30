@@ -33,39 +33,24 @@ export class MicrophoneComponent {
     @Input() waveform: WaveformComponent;
     public utterance: any;
     public recordAudio: any;
+    public startDisabled: boolean;
+    public stopDisabled: boolean;
 
     constructor(public ioService: IoService) {
+      this.startDisabled = false;
+      this.stopDisabled = true;
     }
-
-    /*
-    setupButtons() {
-      let me = this;
-
-      addMultipleEventListener(this.recordButton,
-        ['touchstart', 'mousedown'], async function(e: Event) {
-          e.preventDefault();
-
-      });
-      addMultipleEventListener(this.recordButton,
-        ['touchend', 'mouseup'], function(e: Event) {
-          e.preventDefault();
-      });
-      addMultipleEventListener(this.recordButton,
-        ['touchcancel', 'touchmove'], function(e: Event) {
-          e.preventDefault();
-      });
-    }*/
 
     onStart() {
       // recording started
-      // startRecording.disabled = true;
+      this.startDisabled = true;
+      this.stopDisabled = false;
       let me = this;
       // make use of HTML 5/WebRTC, JavaScript getUserMedia()
       // to capture the browser microphone stream
-      navigator.getUserMedia({
+      navigator.mediaDevices.getUserMedia({
           audio: true
-      }, function(stream: MediaStream) {
-          me.waveform.start(stream);
+      }).then(function(stream: MediaStream) {
           me.recordAudio = RecordRTC(stream, {
               type: 'audio',
               mimeType: 'audio/webm',
@@ -81,10 +66,10 @@ export class MicrophoneComponent {
               // get intervals based blobs
               // value in milliseconds
               // as you might not want to make detect calls every seconds
-              timeSlice: 3000,
+              timeSlice: 4000,
 
               // only for audio track
-              audioBitsPerSecond: 128000,
+              // audioBitsPerSecond: 128000,
 
               // used by StereoAudioRecorder
               // the range 22050 to 96000.
@@ -93,21 +78,22 @@ export class MicrophoneComponent {
 
               // as soon as the stream is available
               ondataavailable(blob) {
+                me.waveform.start(stream);
                 me.ioService.sendBinaryStream(blob);
               }
           });
 
           me.recordAudio.startRecording();
           // stopRecording.disabled = false;
-      }, function(error) {
+      }).catch(function(error) {
           console.error(JSON.stringify(error));
       });
     }
 
     onStop() {
       // recording stopped
-      // startRecording.disabled = false;
-      // stopRecording.disabled = true;
+      this.startDisabled = false;
+      this.stopDisabled = true;
 
       // stop audio recorder
       let me = this;
