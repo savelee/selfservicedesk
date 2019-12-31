@@ -11,9 +11,9 @@
   "scripts": {
     "start": "node simpleserver.js"
   },
-
   "private": true,
   "dependencies": {
+    "@google-cloud/speech": "^3.5.3",
     "cors": "^2.8.5",
     "dialogflow": "^0.14.1",
     "dotenv": "^8.2.0",

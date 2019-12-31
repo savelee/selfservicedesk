@@ -2,11 +2,17 @@
 
 Here are the steps, to run these examples locally:
 
-1. Install the required libraries, run the following command in this *examples* folder:
+1. Get this repo running locally:
+   
+   Follow the steps from https://github.com/savelee/selfservicedesk/README.md. You can skip the Deploy with AppEngine steps.
+
+   These steps will: setup a Google Cloud Project, enable Google Cloud APIs, setup a service account and setup a Dialogflow Agent.
+
+2. Install the required libraries, run the following command in this *examples* folder:
 
     `npm install`
 
-1. Start the simpleserver node app:
+3. Start the simpleserver node app:
 
    `npm --EXAMPLE=1 --PORT=8080 --PROJECT_ID=[your-gcp-project-id] run start`
 
