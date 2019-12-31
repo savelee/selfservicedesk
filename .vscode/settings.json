@@ -1,8 +1,0 @@
-{
-    "files.exclude": {
-        "client/src/**/*.js": true,
-        "client/src/**/*.js.map": true,
-        "server/*.js": true,
-        "server/*.js.map": true
-    }
-}

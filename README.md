@@ -73,6 +73,35 @@ It will also deploy a Dialogflow Agent, for intent matching.
 
 1. Click **settings**, **Import**, and upload the Dialogflow agent zip, you just created.
 
+1. *Caution: Knowledge connector settings are not currently included when exporting, importing, or restoring agents.*
+
+    Make sure you have enabled *Beta* features in settings.
+
+    1. Select *Knowledge* from the left menu.
+    1. Create a Knowledge Base: **Airports**
+    1. Add the following Knowledge Base **FAQs**, as **text/html** documents:
+
+    * https://www.panynj.gov/port-authority/en/help-center/faq/airports-faq-help-center.html
+    * 
+    https://www.schiphol.nl/en/before-you-take-off/
+    * https://www.flysfo.com/faqs
+
+    1. As a response it requires the following custom payload:
+
+    ```
+    {
+    "knowledgebase": true,
+    "QUESTION": "$Knowledge.Question[1]",
+    "ANSWER": "$Knowledge.Answer[1]"
+    }
+    ```
+
+    1. And to make the Text to Speech version of the answer working add the following Text SSML response:
+
+    ```
+    $Knowledge.Answer[1]
+    ```
+
 ## Deploy with App Engine Flex
 
 This demo makes heavy use of websockets and

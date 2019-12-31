@@ -39,7 +39,7 @@ export class IoService {
         // stream directly to server
         // it will be temp. stored locally
         ss(me.socket).emit('stream', stream, {
-            name: '../_temp/stream.wav',
+            name: '_temp/stream.wav',
             size: blob.size
         });
         // pipe the audio blob to the read stream

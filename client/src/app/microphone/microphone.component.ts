@@ -42,10 +42,9 @@ export class MicrophoneComponent {
     }
 
     onStart() {
-      // recording started
-      this.startDisabled = true;
-      this.stopDisabled = false;
       let me = this;
+      me.startDisabled = true;
+      me.stopDisabled = false;
       // make use of HTML 5/WebRTC, JavaScript getUserMedia()
       // to capture the browser microphone stream
       navigator.mediaDevices.getUserMedia({
@@ -78,13 +77,12 @@ export class MicrophoneComponent {
 
               // as soon as the stream is available
               ondataavailable(blob) {
-                me.waveform.start(stream);
                 me.ioService.sendBinaryStream(blob);
               }
           });
-
           me.recordAudio.startRecording();
-          // stopRecording.disabled = false;
+          // recording started
+          me.waveform.start(stream);
       }).catch(function(error) {
           console.error(JSON.stringify(error));
       });

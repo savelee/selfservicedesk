@@ -95,6 +95,8 @@ export class App {
                 var filename = path.basename(data.name);
                 stream.pipe(fs.createWriteStream(filename));
                 
+                console.log('streaming: ' + filename);
+
                 dialogflow.detectIntentStream(stream, function(results: any){
                     console.log(results);
                     me.socketClient.emit('results', results);

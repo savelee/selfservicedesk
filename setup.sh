@@ -88,30 +88,51 @@ echo $ACCESS_TOKEN
 
 JSONPROD="{\"defaultLanguageCode\":\"en\",\"displayName\":\"$PROD_AGENT_NAME\",\"parent\":\"projects/$PROJECT_ID\",\"timeZone\":\"Europe/Madrid\"}"
 curl -H "Content-Type: application/json; charset=utf-8"  \
--H "Authorization: Bearer $ACCESS_TOKEN" \
+-H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
 -d $JSONPROD "https://dialogflow.googleapis.com/v2/projects/$PROJECT_ID/agent"
 
 IMPORTFILES="{\"agentUri\":\"gs://$GCLOUD_STORAGE_BUCKET_NAME/agent.zip\"}"
 
 bold "Import Intents to Prod"
 curl -X POST \
--H "Authorization: Bearer $ACCESS_TOKEN" \
+-H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
 -H "Content-Type: application/json; charset=utf-8" \
 -d $IMPORTFILES \
 https://dialogflow.googleapis.com/v2/projects/$PROJECT_ID/agent:import
 
-bold "Create a GKE cluster"
-gcloud beta container clusters create selfservicedesk \
---addons=HorizontalPodAutoscaling,HttpLoadBalancing,CloudRun \
---machine-type=n1-standard-2 \
---num-nodes=3 \
---zone=europe-west1-b \
---enable-stackdriver-kubernetes 
+KBAIRPORTS = "{\"displayName\": \"Airports\" }"
 
-bold "Build the container"
-gcloud builds submit --tag gcr.io/$PROJECT_ID/selfservicedesk
+bold "Caution: Knowledge connector settings are not currently included when exporting, importing, or restoring agents."
+curl -X POST \
+-H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
+-H "Content-Type: application/json; charset=utf-8" \
+-d $KBAIRPORTS \
+https://dialogflow.googleapis.com/v2beta1/projects/$PROJECT_ID/knowledgeBases
 
-bold "Deploy to the cluster"
-gcloud run deploy selfservicedesk --image gcr.io/$PROJECT_ID/selfservicedesk --platform gke --cluster selfservicedesk --cluster-location europe-west1-b --update-env-vars PROJECT_ID=$PROJECT_ID,LANGUAGE_CODE=en-US,ENCODING=AUDIO_ENCODING_LINEAR_16,SAMPLE_RATE_HERZ=16000,SINGLE_UTTERANCE=true
+bold "Add knowledge bases"
+SCHIPHOL = { \"displayName\": \"Airports\", \"mimeType": \"text/html\", \"knowledgeTypes\": \"FAQ\", \"contentUri\": \"https://cloud.google.com/storage/docs/faq\" }"
+JFK = { \"displayName\": \"Airports\", \"mimeType": \"text/html\", \"knowledgeTypes\": \"FAQ\", \"contentUri\": \"https://cloud.google.com/storage/docs/faq\" }"
+SFO = { \"displayName\": \"Airports\", \"mimeType": \"text/html\", \"knowledgeTypes\": \"FAQ\", \"contentUri\": \"https://cloud.google.com/storage/docs/faq\" }"
+
+bold "Add knowledge bases:"
+bold "CAUTION! TODO REQUIRES KB id from previous request!"
+curl -X POST \
+-H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
+-H "Content-Type: application/json; charset=utf-8" \
+-d $SCHIPHOL \
+https://dialogflow.googleapis.com/v2beta1/projects/$PROJECT_ID/knowledgeBases/knowledge-base-id/documents
+curl -X POST \
+-H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
+-H "Content-Type: application/json; charset=utf-8" \
+-d $JFK \
+https://dialogflow.googleapis.com/v2beta1/projects/$PROJECT_ID/knowledgeBases/knowledge-base-id/documents
+curl -X POST \
+-H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
+-H "Content-Type: application/json; charset=utf-8" \
+-d $SFO \
+https://dialogflow.googleapis.com/v2beta1/projects/$PROJECT_ID/knowledgeBases/knowledge-base-id/documents
+
+bold "Deploy with App Engine Flex"
+gcloud app deploy
 
 bold "Setup & Deployment complete!"
