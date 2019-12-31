@@ -16,14 +16,14 @@
 
 <body>
     <div style="margin: 20px">
-        <h1 style="font-size: 18px;">Example 4: Speech to Text Transcribe Recognize Call</h1>
+        <h1 style="font-size: 18px;">Example 5: Speech to Text Transcribe Streaming Recognize</h1>
 
         <div>
-            <button id="start-recording" disabled>Start Recording</button>
-            <button id="stop-recording" disabled>Stop Recording</button>
+            <button id="start-recording" disabled>Start Streaming</button>
+            <button id="stop-recording" disabled>Stop Streaming</button>
         </div>
 
-        <h2 style="font-size: 14px;">Results: data[0].results[0].alternatives[0].transcript</h2>
+        <h2 style="font-size: 14px;">Results: data.results[0].alternatives[0].transcript</h2>
         <textarea id="results" style="width: 800px; height: 300px;"></textarea>
     </div>
 
@@ -35,13 +35,12 @@
         startRecording.disabled = false;
     });
 
-    // when the server found results send
+    // when the server found results and send
     // it back to the client
     const resultpreview = document.getElementById('results');
     socketio.on('results', function (data) {
-        // show the results on the screen
-        if(data[0] && data[0].results[0] && data[0].results[0].alternatives[0]){
-            resultpreview.innerHTML += "" + data[0].results[0].alternatives[0].transcript;
+        if(data && data.results[0] && data.results[0].alternatives[0]){
+            resultpreview.innerHTML += " " + data.results[0].alternatives[0].transcript;
         }
     });
 
@@ -82,7 +81,22 @@
                 // used by StereoAudioRecorder
                 // the range 22050 to 96000.
                 // let us force 16khz recording:
-                desiredSampRate: 16000
+                desiredSampRate: 16000,
+
+                // as soon as the stream is available
+                ondataavailable: function(blob) {
+                    // making use of socket.io-stream for bi-directional
+                    // streaming, create a stream
+                    var stream = ss.createStream();
+                    // stream directly to server
+                    // it will be temp. stored locally
+                    ss(socket).emit('stream-transcribe', stream, {
+                        name: 'stream.wav', 
+                        size: blob.size
+                    });
+                    // pipe the audio blob to the read stream
+                    ss.createBlobReadStream(blob).pipe(stream);
+                }
             });
 
             recordAudio.startRecording();
@@ -97,22 +111,6 @@
         // recording stopped
         startRecording.disabled = false;
         stopRecording.disabled = true;
-
-        // stop audio recorder
-        recordAudio.stopRecording(function() {
-
-            // after stopping the audio, get the audio data
-            recordAudio.getDataURL(function(audioDataURL) {
-                var files = {
-                    audio: {
-                        type: recordAudio.getBlob().type || 'audio/wav',
-                        dataURL: audioDataURL
-                    }
-                };
-                // submit the audio file to the server
-                socketio.emit('message-transcribe', files);
-            });
-        });
     };
     </script>
 
