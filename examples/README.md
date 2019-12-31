@@ -32,9 +32,8 @@ To switch to the various examples, edit the EXAMPLE variable to one of these:
 * Example **3**: Dialogflow Speech Intent Detection with Text to Speech output
 * Example **4**: Speech to Text Transcribe Recognize Call
 * Example **5**: Speech to Text Transcribe Streaming Recognize
-* Example **6**: Text to Speech
 
 1. Browse to http://localhost:8080. Open the inspector, to preview the
 Dialogflow results object.
 
-The code required for these examples can be found in **simpleserver.js** for the different Dialogflow & STT calls. - example1.html - example6.html will show the client-side implementation.
+The code required for these examples can be found in **simpleserver.js** for the different Dialogflow & STT calls. - example1.html - example5.html will show the client-side implementation.
