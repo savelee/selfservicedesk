@@ -71,7 +71,7 @@ It will also deploy a Dialogflow Agent, for intent matching.
 
 1. Zip the contents of the *dialogflow* folder, from this repo.
 
-1. Click **settings**, **Import**, and upload the Dialogflow agent zip, you just created.
+1. Click **settings** > **Import**, and upload the Dialogflow agent zip, you just created.
 
 1. *Caution: Knowledge connector settings are not currently included when exporting, importing, or restoring agents.*
 
@@ -82,8 +82,7 @@ It will also deploy a Dialogflow Agent, for intent matching.
     1. Add the following Knowledge Base **FAQs**, as **text/html** documents:
 
     * https://www.panynj.gov/port-authority/en/help-center/faq/airports-faq-help-center.html
-    * 
-    https://www.schiphol.nl/en/before-you-take-off/
+    * https://www.schiphol.nl/en/before-you-take-off/
     * https://www.flysfo.com/faqs
 
     1. As a response it requires the following custom payload:
