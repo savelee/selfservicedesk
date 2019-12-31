@@ -19,14 +19,13 @@ set -a
 bold "Starting the setup process in project $PROJECT_ID..."
 bold "Enable APIs..."
 gcloud services enable \
-  container.googleapis.com \ 
+  appengineflex.googleapis.com \
   containerregistry.googleapis.com \
   cloudbuild.googleapis.com \
   run.googleapis.com \
   cloudtrace.googleapis.com \
   dialogflow.googleapis.com \
   logging.googleapis.com \
-  dns.googleapis.com \
   monitoring.googleapis.com \
   sourcerepo.googleapis.com \
   translate.googleapis.com

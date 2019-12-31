@@ -36,34 +36,32 @@ It will also deploy a Dialogflow Agent, for intent matching.
 
  ```
   gcloud services enable \
-  container.googleapis.com \ 
+  appengineflex.googleapis.com \
   containerregistry.googleapis.com \
   cloudbuild.googleapis.com \
-  run.googleapis.com \
   cloudtrace.googleapis.com \
   dialogflow.googleapis.com \
   logging.googleapis.com \
-  dns.googleapis.com \
   monitoring.googleapis.com \
   sourcerepo.googleapis.com \
   translate.googleapis.com
 ```
 
-2. Build the client-side Angular app:
+1. Build the client-side Angular app:
     
     ```
     cd client && npm install
     npm run-script build
     ```
 
-3. Start the server Typescript app, which is exposed on port 8080:
+2. Start the server Typescript app, which is exposed on port 8080:
 
     ```
     cd ../server && npm install
     npm run-script watch
     ```
 
-4. Browse to http://localhost:8080
+3. Browse to http://localhost:8080
 
 ## Setup Dialogflow
 

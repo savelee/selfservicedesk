@@ -16,15 +16,15 @@
 
 <body>
     <div style="margin: 20px">
-        <h1 style="font-size: 18px;">Example 1: Dialogflow Speech Detect Intent Demo</h1>
+        <h1 style="font-size: 18px;">Example 3: Dialogflow Speech Intent Detection with Text to Speech output</h1>
 
         <div>
             <button id="start-recording" disabled>Start Recording</button>
             <button id="stop-recording" disabled>Stop Recording</button>
         </div>
 
-        <h2 style="font-size: 14px;">Results: data.fulfillmentText</h2>
-        <textarea id="results" style="width: 800px; height: 300px;"></textarea>
+        <h2 style="font-size: 14px;">Results: data[0].outputAudio</h2>
+        <p>Make sure your speakers are turned on.</p>
     </div>
 
     <script type="text/javascript">
@@ -40,10 +40,8 @@
     const resultpreview = document.getElementById('results');
     socketio.on('results', function (data) {
         console.log(data);
-        // show the results on the screen
-        if(data.fulfillmentText){
-            resultpreview.innerHTML += "" + data.fulfillmentText;
-        }
+        console.log(data[0].outputAudio);
+        playOutput(data[0].outputAudio);
     });
 
     const startRecording = document.getElementById('start-recording');
@@ -115,6 +113,33 @@
             });
         });
     };
+
+     /*
+   * When working with Dialogflow and Dialogflow matched an intent,
+   * and returned an audio buffer. Play this output.
+   */
+   function playOutput(arrayBuffer){
+        let me = this;
+        let audioContext = new AudioContext();
+        let outputSource;
+        try {
+            if(arrayBuffer.byteLength > 0){
+                audioContext.decodeAudioData(arrayBuffer,
+                function(buffer){
+                    audioContext.resume();
+                    outputSource = audioContext.createBufferSource();
+                    outputSource.connect(audioContext.destination);
+                    outputSource.buffer = buffer;
+                    outputSource.start(0);
+                },
+                function(){
+                    console.log(arguments);
+                });
+            }
+        } catch(e) {
+            console.log(e);
+        }
+    }
     </script>
 
 </body>

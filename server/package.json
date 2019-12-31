@@ -12,8 +12,7 @@
     "start": "node dist/index.js",
     "watch": "nodemon --watch \"**/*.ts\" --exec \"ts-node\" index.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "build": "tsc -p .",
-    "compile-proto": "mkdir -p pbjs-genfiles && pbjs -p ./node_modules/google-proto-files google/cloud/dialogflow/v2beta1/session.proto -o ./pbjs-genfiles/proto.js -t static-module"
+    "build": "tsc -p ."
   },
   "private": true,
   "dependencies": {
