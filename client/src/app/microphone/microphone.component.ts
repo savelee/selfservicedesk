@@ -126,6 +126,5 @@ export class MicrophoneComponent {
 
     reset() {
       this.fulfillmentService.clearAll();
-      this.fulfillmentService.setFulfillment();
     }
 }
