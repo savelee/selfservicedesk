@@ -29,6 +29,7 @@ gcloud services enable \
   monitoring.googleapis.com \
   sourcerepo.googleapis.com \
   speech.googleapis.com \
+  texttospeech.googleapis.com \
   translate.googleapis.com
 
 

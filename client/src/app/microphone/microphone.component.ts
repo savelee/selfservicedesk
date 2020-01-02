@@ -82,7 +82,7 @@ export class MicrophoneComponent {
           });
           me.recordAudio.startRecording();
           // recording started
-          me.waveform.start(stream);
+          // me.waveform.start(stream);
       }).catch(function(error) {
           console.error(JSON.stringify(error));
       });
@@ -95,7 +95,6 @@ export class MicrophoneComponent {
 
       // stop audio recorder
       let me = this;
-      me.waveform.stop();
       this.recordAudio.stopRecording(function() {
           // after stopping the audio, get the audio data
           me.recordAudio.getDataURL(function(audioDataURL) {
@@ -109,5 +108,6 @@ export class MicrophoneComponent {
               me.ioService.sendMessage('message', files);
           });
       });
+      // me.waveform.stop();
     }
 }

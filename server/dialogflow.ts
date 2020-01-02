@@ -41,7 +41,8 @@ export class Dialogflow {
       this.languageCode = process.env.LANGUAGE_CODE;
       this.projectId = process.env.PROJECT_ID;
       this.encoding = process.env.ENCODING;
-      this.singleUtterance = ((process.env.SINGLE_UTTERANCE == 'true') || true);
+      this.singleUtterance = (process.env.SINGLE_UTTERANCE == 'true');
+      console.log(this.singleUtterance);
       this.sampleRateHertz = parseInt(process.env.SAMPLE_RATE_HERZ);
       this.setupDialogflow();
   }
@@ -71,6 +72,11 @@ export class Dialogflow {
             languageCode: this.languageCode,
           },
           singleUtterance: this.singleUtterance
+        },
+        outputAudio: {
+          outputAudioConfig: {
+            audioEncoding: `OUTPUT_AUDIO_ENCODING_LINEAR_16`
+          } 
         }
       }
   }
@@ -97,13 +103,7 @@ export class Dialogflow {
     const me = this;
     const stream = this.sessionClient.streamingDetectIntent()
       .on('data', function(data: any){
-        if (data.recognitionResult) {
-          cb({
-            UTTERANCE: data.recognitionResult.transcript
-          });
-        } else {
-          cb(me.getHandleResponses(data));   
-        }
+        cb(me.getHandleResponses(data));   
       })
       .on('error', (e: any) => {
         console.log(e);
@@ -120,7 +120,6 @@ export class Dialogflow {
     // StreamingDetectIntentRequest.output_audio_config. 
     // The message must not contain StreamingDetectIntentRequest.input_audio.
     stream.write(this.request);
-    
     // pump is a small node module that pipes streams together and 
     // destroys all of them if one of them closes.
     await pump(
@@ -129,7 +128,9 @@ export class Dialogflow {
       new Transform({
         objectMode: true,
         transform: (obj: any, _: any, next: any) => {
-          next(null, { inputAudio: obj });
+          next(null, { 
+            inputAudio: obj
+          });
         }
       }),
       stream
@@ -142,11 +143,18 @@ export class Dialogflow {
   * @param cb Callback function to send results
   */
   public getHandleResponses(responses: any): any {
-    let json = {};
-    const result = responses.queryResult;
+    var json:DF_RESULT = {};
+    var result = responses.queryResult;
+    var AUDIO = responses.outputAudio;
+
+    // console.log(responses);
+    if (responses.recognitionResult && responses.recognitionResult.isFinal == false) {
+      return {
+        UTTERANCE: responses.recognitionResult.transcript
+      };
+    } else {
 
     if (result && result.intent) {
-      console.log(result);
       const INTENT_NAME = result.intent.displayName;
       const PARAMETERS = JSON.stringify(pb.struct.decode(result.parameters));
       const QUERY_TEXT = result.fulfillmentText;
@@ -158,13 +166,37 @@ export class Dialogflow {
         INTENT_NAME,
         QUERY_TEXT,
         PARAMETERS,
-        PAYLOAD
+        PAYLOAD,
+        AUDIO
       }
-      
+      console.log(json);
       return json;
     }
+
+    // if (AUDIO.length > 0) {
+      // The audio is not included when an intent match happend. (the fulfillment will be returned, with an empty audio buffer)
+      // then the audio comes in later.
+      // Caution: once the audio is returned, the microphone will pick up the returning audio
+      // and thus you run in an endless loop.
+      // It would work fine, if you use TTS in an detectIntent() call. - or manually stop the streaming before playing.
+
+      // json['AUDIO'] = AUDIO;
+      //return json;
+
+
+    // }
+  }
+    
     
   }
+}
+
+declare interface DF_RESULT {
+  AUDIO?: AudioBuffer,
+  INTENT_NAME?: string,
+  QUERY_TEXT?: string,
+  PARAMETERS?: any,
+  PAYLOAD?: any
 }
 
 export let dialogflow = new Dialogflow();

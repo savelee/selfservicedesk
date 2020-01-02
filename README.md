@@ -45,6 +45,7 @@ It will also deploy a Dialogflow Agent, for intent matching.
   monitoring.googleapis.com \
   sourcerepo.googleapis.com \
   speech.googleapis.com \
+  texttospeech.googleapis.com \
   translate.googleapis.com
 ```
 

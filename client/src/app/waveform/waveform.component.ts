@@ -76,7 +76,7 @@ export class WaveformComponent implements OnInit {
         function draw() {
             me.myReq = requestAnimationFrame(draw);
             me.analyser.getByteTimeDomainData(dataArray);
-            me.canvasCtx.fillStyle = 'rgb(255, 165, 0)';
+            me.canvasCtx.fillStyle = '#1a1a1a';
             me.canvasCtx.fillRect(0, 0, width, height);
             me.canvasCtx.lineWidth = 4;
             me.canvasCtx.strokeStyle = 'rgb(256, 256, 256)';

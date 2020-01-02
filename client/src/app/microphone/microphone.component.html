@@ -1,4 +1,4 @@
-<button type="button" class="card highlight-card card-small mic_button start_btn" [disabled]="startDisabled" (click)="onStart();">
+<button type="button" class="btn mic_button start_btn" [disabled]="startDisabled" (click)="onStart();">
     <svg
     xmlns="http://www.w3.org/2000/svg"
     height="20"
@@ -55,11 +55,11 @@
       d="m 297.96875,242 c 2.63281,0 5.21094,-1.07031 7.07031,-2.92969 1.85938,-1.85937 2.92969,-4.4414 2.92969,-7.07031 0,-2.62891 -1.06641,-5.21094 -2.92969,-7.07031 C 303.17969,223.07031 300.60156,222 297.96875,222 c -2.62891,0 -5.20703,1.07031 -7.06641,2.92969 -1.85937,1.85937 -2.93359,4.4414 -2.93359,7.07031 0,2.62891 1.07031,5.21094 2.93359,7.07031 1.85938,1.85938 4.4375,2.92969 7.06641,2.92969 z m 0,0" />
  </svg>
  
-   
-    <span>Start Recording</span>
+    <span>Ask a question</span>
 </button>
 
-<button type="button" class="card highlight-card card-small mic_button stop_btn" [disabled]="stopDisabled" (click)="onStop();">
+<div class="endsession">
+<button type="button" class="btn mic_button stop_btn" [disabled]="stopDisabled" (click)="onStop();">
 <svg
    xmlns:svg="http://www.w3.org/2000/svg"
    height="20"
@@ -139,9 +139,9 @@
 </g>
 </svg>
     
-    <span>Stop Recording</span>
+    <span>Next customer</span>
 </button>
-
+</div>
   
 
   

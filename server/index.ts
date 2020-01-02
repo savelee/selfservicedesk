@@ -98,27 +98,20 @@ export class App {
                 console.log('streaming: ' + filename);
 
                 dialogflow.detectIntentStream(stream, function(results: any){
-                    console.log(results);
                     me.socketClient.emit('results', results);
                 });
             
-                stream.on('data', function(chunk: any){
-                    // console.log(chunk);
-                });
-                stream.on('end', function () {
-                    //console.log('end');
-                });
-
             });
         });
     }
 
     public prepareAudioDetection(dataURL: string): void {
+        let me = this;
         dataURL = dataURL.split(',').pop();
         let fileBuffer = Buffer.from(dataURL, 'base64');
 
         dialogflow.detectIntent(fileBuffer, function(results: any){
-            console.log(results);
+            me.socketClient.emit('results', results);
         });
     }
 }

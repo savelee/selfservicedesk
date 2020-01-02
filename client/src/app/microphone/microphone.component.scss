@@ -25,28 +25,8 @@ and (orientation : portrait) {
     font-size: 14px;
 }
 
-.card.highlight-card {
-    background-color: #ef6c00;
-    color: white;
-    font-weight: 600;
-    border: none;
-    padding: 10px;
-    text-decoration: none;
-  }
-.card.highlight-card svg {
-    fill: white;
-}
 .card.card.highlight-card span {
     margin-left: 10px;
-}
-
-.card.highlight-card:hover {
-    text-decoration: none;
-    background-color: #c75d06;
-    color: #fff;
-    svg {
-        fill: #fff !important;  
-    }
 }
 
 .start_btn, .stop_btn {
@@ -55,18 +35,6 @@ and (orientation : portrait) {
     font-size: 14px;
     cursor: pointer;
 }
-
-.start_btn:disabled,
-.stop_btn:disabled {
-    background-color: #c75d06;
-    color: #df6502;
-    cursor: not-allowed;
-    
-    svg {
-        fill: #df6502 !important;  
-    }
-}
-
 
 hr {
     margin: 0 100px;

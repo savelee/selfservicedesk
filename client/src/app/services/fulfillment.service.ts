@@ -7,12 +7,11 @@ export class FulfillmentService {
     constructor() {
         this.matches = [];
         this.fulfillment = {
-            UTTERANCE: 'press record',
+            UTTERANCE: 'Press ask a question button',
             FULFILLMENTS: []
         };
     }
     getFulfillment() {
-        // console.log(this.fulfillment);
         return this.fulfillment;
     }
     setFulfillments(data) {
@@ -31,7 +30,8 @@ export class FulfillmentService {
             } else {
                 this.matches.push({
                     QUESTION: data.INTENT_NAME,
-                    ANSWER: data.QUERY_TEXT
+                    ANSWER: data.QUERY_TEXT,
+                    AUDIO: data.AUDIO
                 });
             }
             this.fulfillment.FULFILLMENTS = this.matches;

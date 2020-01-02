@@ -38,6 +38,36 @@ export class DialogflowComponent implements AfterViewInit {
     let me = this;
     me.ioService.receiveStream('results', function(data) {
       me.fulfillmentService.setFulfillments(data);
+      if (data && data.AUDIO) {
+        me.playOutput(data.AUDIO);
+      }
     });
   }
+
+  /*
+   * When Dialogflow matched an intent,
+   * return an audio buffer to play this sound output.
+   */
+  playOutput(arrayBuffer) {
+    let audioContext = new AudioContext();
+    let outputSource;
+    try {
+        if (arrayBuffer.byteLength > 0) {
+            audioContext.decodeAudioData(arrayBuffer,
+            function(buffer) {
+                audioContext.resume();
+                outputSource = audioContext.createBufferSource();
+                outputSource.connect(audioContext.destination);
+                outputSource.buffer = buffer;
+                outputSource.start(0);
+            },
+            function() {
+                console.log(arguments);
+            });
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 }
