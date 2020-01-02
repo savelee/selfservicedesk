@@ -1,4 +1,4 @@
-const speech = require('@google-cloud/speech');
+const speechToText = require('@google-cloud/speech');
 const textToSpeech = require('@google-cloud/text-to-speech');
 
 interface LooseObject {
@@ -23,7 +23,7 @@ export class Speech {
 
     setupSpeech(){
         this.tts = new textToSpeech.TextToSpeechClient();
-        this.stt = new speech.SpeechClient();
+        this.stt = new speechToText.SpeechClient();
 
         this.ttsRequest = {
           // Select the language and SSML Voice Gender (optional)
@@ -85,3 +85,5 @@ export class Speech {
     }
 
 }
+
+export let speech = new Speech();

@@ -18,6 +18,7 @@
 
 import * as dotenv from 'dotenv';
 import { dialogflow } from './dialogflow';
+import { speech } from './speech';
 import * as socketIo from 'socket.io';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -80,38 +81,37 @@ export class App {
         });
 
         this.io.on('connect', (client: any) => {
-            this.socketClient = client;
+            var me = this;
+            me.socketClient = client;
             console.log(`Client connected [id=${client.id}]`);
             client.emit('server_setup', `Server connected [id=${client.id}]`);
 
-            client.on('message', function (results: any) {
-                // me.prepareAudioDetection(results.audio.dataURL);
-                // client.emit('results', results);
-            });
+            // simple DF detectIntent call
+            /*client.on('message', function (results: any) {
+                let dataURL = results.audio.dataURL;
+                dataURL = dataURL.split(',').pop();
+                let fileBuffer = Buffer.from(dataURL, 'base64');
+        
+                dialogflow.detectIntent(fileBuffer, function(results: any){
+                    me.socketClient.emit('results', results);
+                });
+            });*/
 
-            var me = this;
+            // DF detect stream call
             ss(client).on('stream', function(stream: any, data: any) {
-                
                 var filename = path.basename(data.name);
                 stream.pipe(fs.createWriteStream(filename));
-                
-                console.log('streaming: ' + filename);
-
                 dialogflow.detectIntentStream(stream, function(results: any){
                     me.socketClient.emit('results', results);
                 });
-            
             });
-        });
-    }
 
-    public prepareAudioDetection(dataURL: string): void {
-        let me = this;
-        dataURL = dataURL.split(',').pop();
-        let fileBuffer = Buffer.from(dataURL, 'base64');
-
-        dialogflow.detectIntent(fileBuffer, function(results: any){
-            me.socketClient.emit('results', results);
+            // TTS call
+            ss(client).on('tts', function(text: string) {
+                speech.textToSpeech(text).then(function(audio: AudioBuffer){
+                    me.socketClient.emit('audio', audio);
+                }).catch(function(e) { console.log(e); })
+            });
         });
     }
 }
