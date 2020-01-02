@@ -3,11 +3,13 @@ import { Fulfillment } from '../models/fulfillment.model';
 export class FulfillmentService {
     public fulfillment: Fulfillment;
     public matches: any;
+    private defaultMessage: string;
 
     constructor() {
+        this.defaultMessage = 'Press ask a question button';
         this.matches = [];
         this.fulfillment = {
-            UTTERANCE: 'Press ask a question button',
+            UTTERANCE: this.defaultMessage,
             FULFILLMENTS: []
         };
     }
@@ -36,5 +38,10 @@ export class FulfillmentService {
             }
             this.fulfillment.FULFILLMENTS = this.matches;
         }
+    }
+    clearAll() {
+        this.matches = [];
+        this.fulfillment.UTTERANCE = this.defaultMessage;
+        return this.fulfillment.FULFILLMENTS = [];
     }
 }

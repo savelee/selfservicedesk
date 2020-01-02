@@ -16,10 +16,11 @@
  * =============================================================================
  */
 
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, EventEmitter, Output } from '@angular/core';
 import { FulfillmentService } from '../services/fulfillment.service';
 import { IoService } from '../services/io.service';
 import { Fulfillment } from '../models/fulfillment.model';
+import { EventService } from '../services/event.service';
 
 @Component({
   selector: 'app-dialogflow',
@@ -30,7 +31,7 @@ import { Fulfillment } from '../models/fulfillment.model';
 export class DialogflowComponent implements AfterViewInit {
   public fulfillment: Fulfillment;
 
-  constructor(public fulfillmentService: FulfillmentService, public ioService: IoService) {
+  constructor(public fulfillmentService: FulfillmentService, public ioService: IoService, public eventService: EventService) {
     this.fulfillment = this.fulfillmentService.getFulfillment();
   }
 
@@ -42,13 +43,31 @@ export class DialogflowComponent implements AfterViewInit {
         me.playOutput(data.AUDIO);
       }
     });
+
+    me.ioService.receiveStream('audio', function(audio) {
+      if (audio) {
+        me.playOutput(audio);
+      }
+    });
   }
 
-  /*
+  /**
+   * Text to Speech event, when clicked on a Dialogflow results card
+   * @param event event
+   */
+  textToSpeech(event) {
+    let me = this;
+    let answerNode = event.target.parentNode.querySelector('.answer');
+    let text = answerNode.innerHTML;
+    me.eventService.audioPlaying.emit();
+    me.ioService.sendMessage('tts', { text });
+  }
+
+  /**
    * When Dialogflow matched an intent,
    * return an audio buffer to play this sound output.
    */
-  playOutput(arrayBuffer) {
+  playOutput(arrayBuffer: ArrayBuffer) {
     let audioContext = new AudioContext();
     let outputSource;
     try {
@@ -68,6 +87,6 @@ export class DialogflowComponent implements AfterViewInit {
     } catch (e) {
         console.log(e);
     }
-}
+  }
 
 }

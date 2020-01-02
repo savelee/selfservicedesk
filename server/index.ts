@@ -107,8 +107,9 @@ export class App {
             });
 
             // TTS call
-            ss(client).on('tts', function(text: string) {
-                speech.textToSpeech(text).then(function(audio: AudioBuffer){
+            client.on('tts', function(obj: any) {
+                console.log(obj);
+                speech.textToSpeech(obj.text).then(function(audio: AudioBuffer){
                     me.socketClient.emit('audio', audio);
                 }).catch(function(e) { console.log(e); })
             });

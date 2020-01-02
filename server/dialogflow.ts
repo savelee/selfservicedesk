@@ -42,7 +42,6 @@ export class Dialogflow {
       this.projectId = process.env.PROJECT_ID;
       this.encoding = process.env.ENCODING;
       this.singleUtterance = (process.env.SINGLE_UTTERANCE == 'true');
-      console.log(this.singleUtterance);
       this.sampleRateHertz = parseInt(process.env.SAMPLE_RATE_HERZ);
       this.setupDialogflow();
   }
@@ -88,7 +87,6 @@ export class Dialogflow {
   */
   public async detectIntent(audio: any, cb:Function){
     this.request.inputAudio = audio;
-    console.log(this.request);
     // Recognizes the speech in the audio and detects its intent.
     const responses = await this.sessionClient.detectIntent(this.request);
     cb(this.getHandleResponses(responses));
@@ -109,7 +107,7 @@ export class Dialogflow {
         console.log(e);
       })
       .on('end', () => {
-        console.log('on end');
+         // on end
       });
 
     // Write request objects.

@@ -16,7 +16,6 @@
  * =============================================================================
  */
 
-import { Injectable } from '@angular/core';
 import * as io from 'socket.io-client';
 
 declare const ss: any;

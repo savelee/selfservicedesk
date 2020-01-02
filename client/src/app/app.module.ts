@@ -8,6 +8,8 @@ import { AppComponent } from './app.component';
 
 import { IoService } from './services/io.service';
 import { FulfillmentService} from './services/fulfillment.service';
+import { EventService} from './services/event.service';
+
 
 import { MicrophoneComponent } from './microphone/microphone.component';
 import { DialogflowComponent } from './dialogflow/dialogflow.component';
@@ -28,7 +30,8 @@ import { WaveformComponent } from './waveform/waveform.component';
   ],
   providers: [
     IoService,
-    FulfillmentService
+    FulfillmentService,
+    EventService
   ],
   bootstrap: [AppComponent]
 })

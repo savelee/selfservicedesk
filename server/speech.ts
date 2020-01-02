@@ -9,6 +9,7 @@ export class Speech {
     private languageCode: string;
     private encoding: string;
     private sampleRateHertz: Number;
+    private ssmlGender: string;
     private tts: any;
     private stt: any;
     private ttsRequest: LooseObject;
@@ -18,6 +19,7 @@ export class Speech {
         this.languageCode = process.env.LANGUAGE_CODE;
         this.encoding = process.env.SPEECH_ENCODING;
         this.sampleRateHertz = parseInt(process.env.SAMPLE_RATE_HERZ);
+        this.ssmlGender = process.env.SSML_GENDER;
         this.setupSpeech();
     }
 
@@ -28,8 +30,8 @@ export class Speech {
         this.ttsRequest = {
           // Select the language and SSML Voice Gender (optional)
           voice: {
-            languageCode: 'en-US', //https://www.rfc-editor.org/rfc/bcp/bcp47.txt
-            ssmlGender: 'NEUTRAL'  //  'MALE|FEMALE|NEUTRAL'
+            languageCode: this.languageCode, //https://www.rfc-editor.org/rfc/bcp/bcp47.txt
+            ssmlGender: this.ssmlGender  //  'MALE|FEMALE|NEUTRAL'
           },
           // Select the type of audio encoding
           audioConfig: {
@@ -79,7 +81,7 @@ export class Speech {
     }
 
     async textToSpeech(text: string) {
-        this.ttsRequest.input = text;
+        this.ttsRequest.input = { text };
         const responses = await this.tts.synthesizeSpeech(this.ttsRequest);
         return responses[0].audioContent;  
     }

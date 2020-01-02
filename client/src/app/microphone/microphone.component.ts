@@ -19,6 +19,8 @@
 import { Component, Input } from '@angular/core';
 import { IoService } from '../services/io.service';
 import { WaveformComponent } from '../waveform/waveform.component';
+import { EventService } from '../services/event.service';
+import { FulfillmentService } from '../services/fulfillment.service';
 
 declare const RecordRTC: any;
 declare const StereoAudioRecorder: any;
@@ -36,10 +38,16 @@ export class MicrophoneComponent {
     public startDisabled: boolean;
     public stopDisabled: boolean;
 
-    constructor(public ioService: IoService) {
-      this.startDisabled = false;
-      this.stopDisabled = true;
+    constructor(public fulfillmentService: FulfillmentService, public ioService: IoService, public eventService: EventService) {
+      let me = this;
+      me.startDisabled = false;
+      me.stopDisabled = true;
+
+      me.eventService.audioPlaying.subscribe(() => {
+        me.onStop();
+      });
     }
+
 
     onStart() {
       let me = this;
@@ -88,16 +96,21 @@ export class MicrophoneComponent {
       });
     }
 
+    onReset() {
+      this.onStop();
+      this.reset();
+    }
+
     onStop() {
       // recording stopped
       this.startDisabled = false;
       this.stopDisabled = true;
 
       // stop audio recorder
-      let me = this;
+      // let me = this;
       this.recordAudio.stopRecording(function() {
           // after stopping the audio, get the audio data
-          me.recordAudio.getDataURL(function(audioDataURL) {
+          /*me.recordAudio.getDataURL(function(audioDataURL) {
               let files = {
                   audio: {
                       type: me.recordAudio.getBlob().type || 'audio/wav',
@@ -106,8 +119,13 @@ export class MicrophoneComponent {
               };
               // submit the audio file to the server
               me.ioService.sendMessage('message', files);
-          });
+          });*/
       });
       // me.waveform.stop();
+    }
+
+    reset() {
+      this.fulfillmentService.clearAll();
+      this.fulfillmentService.setFulfillment();
     }
 }
