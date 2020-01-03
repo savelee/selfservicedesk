@@ -33,22 +33,22 @@
         startRecording.disabled = false;
     });
 
-    //3
+    //3)
     startRecording.onclick = function() {
         startRecording.disabled = true;
 
-        //4
+        //4)
         // make use of WebRTC JavaScript method getUserMedia()
         // to capture the browser microphone stream
         navigator.getUserMedia({
             audio: true
         }, function(stream) {
 
-                //5
+                //5)
                 recordAudio = RecordRTC(stream, {
                     type: 'audio',
 
-                //6
+                //6)
                     mimeType: 'audio/webm',
                     sampleRate: 44100,
                     // used by StereoAudioRecorder
@@ -71,7 +71,7 @@
         });
     };
 
-    //7
+    //7)
     stopRecording.onclick = function() {
         // recording stopped
         startRecording.disabled = false;
@@ -82,7 +82,7 @@
             // after stopping the audio, get the audio data
             recordAudio.getDataURL(function(audioDataURL) {
 
-                //8
+                //8)
                 var files = {
                     audio: {
                         type: recordAudio.getBlob().type || 'audio/wav',
@@ -95,7 +95,7 @@
         });
     };
 
-    // 9
+    //9)
     // when the server found results send
     // it back to the client
     const resultpreview = document.getElementById('results');
