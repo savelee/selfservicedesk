@@ -20,4 +20,6 @@ import { Output, EventEmitter } from '@angular/core';
 
 export class EventService {
     @Output() public audioPlaying: EventEmitter<any> = new EventEmitter();
+    @Output() public audioStopping: EventEmitter<any> = new EventEmitter();
+    @Output() public resetInterface: EventEmitter<any> = new EventEmitter();
 }

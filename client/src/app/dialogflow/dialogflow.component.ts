@@ -30,6 +30,8 @@ import { EventService } from '../services/event.service';
 
 export class DialogflowComponent implements AfterViewInit {
   public fulfillment: Fulfillment;
+  public audioContext: AudioContext;
+  public outputSource: AudioBufferSourceNode;
 
   constructor(public fulfillmentService: FulfillmentService, public ioService: IoService, public eventService: EventService) {
     this.fulfillment = this.fulfillmentService.getFulfillment();
@@ -48,6 +50,9 @@ export class DialogflowComponent implements AfterViewInit {
       if (audio) {
         me.playOutput(audio);
       }
+    });
+    me.eventService.audioStopping.subscribe(() => {
+      me.stopOutput();
     });
   }
 
@@ -68,17 +73,18 @@ export class DialogflowComponent implements AfterViewInit {
    * return an audio buffer to play this sound output.
    */
   playOutput(arrayBuffer: ArrayBuffer) {
-    let audioContext = new AudioContext();
-    let outputSource;
+    let me = this;
     try {
+        me.audioContext = new AudioContext();
+        console.log(this.audioContext);
         if (arrayBuffer.byteLength > 0) {
-            audioContext.decodeAudioData(arrayBuffer,
+            me.audioContext.decodeAudioData(arrayBuffer,
             function(buffer) {
-                audioContext.resume();
-                outputSource = audioContext.createBufferSource();
-                outputSource.connect(audioContext.destination);
-                outputSource.buffer = buffer;
-                outputSource.start(0);
+                me.audioContext.resume();
+                me.outputSource = me.audioContext.createBufferSource();
+                me.outputSource.connect(me.audioContext.destination);
+                me.outputSource.buffer = buffer;
+                me.outputSource.start(0);
             },
             function() {
                 console.log(arguments);
@@ -87,6 +93,13 @@ export class DialogflowComponent implements AfterViewInit {
     } catch (e) {
         console.log(e);
     }
+  }
+
+  /**
+   * Stop audio
+   */
+  stopOutput() {
+    this.outputSource.stop();
   }
 
 }

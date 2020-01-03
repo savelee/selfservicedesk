@@ -52,8 +52,11 @@ export class WaveformComponent implements OnInit {
     }
 
     public stop() {
-        this.source.disconnect(this.analyser);
-        cancelAnimationFrame(this.myReq);
+        if (this.audioCtx.state === 'running') {
+            this.audioCtx.suspend();
+            this.source.disconnect(this.analyser);
+            cancelAnimationFrame(this.myReq);
+        }
     }
 
     visualize() {

@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+import { EventService } from './services/event.service';
 
 @Component({
   selector: 'app-root',
@@ -25,4 +26,10 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'SelfServiceDesk';
+
+  constructor(public eventService: EventService) { }
+
+  onReset() {
+    this.eventService.resetInterface.emit();
+  }
 }

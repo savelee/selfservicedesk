@@ -41,18 +41,20 @@ export class MicrophoneComponent {
     constructor(public fulfillmentService: FulfillmentService, public ioService: IoService, public eventService: EventService) {
       let me = this;
       me.startDisabled = false;
-      me.stopDisabled = true;
 
       me.eventService.audioPlaying.subscribe(() => {
         me.onStop();
       });
+      me.eventService.resetInterface.subscribe(() => {
+        me.onStop(); // stop recording & waveform
+        me.eventService.audioStopping.emit(); // stop playing audio
+        me.reset(); // reset the interface
+      });
     }
-
 
     onStart() {
       let me = this;
       me.startDisabled = true;
-      me.stopDisabled = false;
       // make use of HTML 5/WebRTC, JavaScript getUserMedia()
       // to capture the browser microphone stream
       navigator.mediaDevices.getUserMedia({
@@ -97,15 +99,9 @@ export class MicrophoneComponent {
       });
     }
 
-    onReset() {
-      this.onStop();
-      this.reset();
-    }
-
     onStop() {
       // recording stopped
       this.startDisabled = false;
-      this.stopDisabled = true;
 
       // stop audio recorder
       // let me = this;
