@@ -39,6 +39,7 @@ export class DialogflowComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     let me = this;
+    me.audioContext = new AudioContext();
     me.ioService.receiveStream('results', function(data) {
       me.fulfillmentService.setFulfillments(data);
       if (data && data.AUDIO) {
@@ -64,6 +65,17 @@ export class DialogflowComponent implements AfterViewInit {
     let me = this;
     let answerNode = event.target.parentNode.querySelector('.answer');
     let text = answerNode.innerHTML;
+
+    // iOS Audio hack. - this can only be triggered from a user interaction
+    // create empty buffer to warm up
+    let b = me.audioContext.createBuffer(1, 1, 22050);
+    let tempSource = me.audioContext.createBufferSource();
+    tempSource.buffer = b;
+    // connect to output (your speakers)
+    tempSource.connect(me.audioContext.destination);
+    // play the temp file
+    tempSource.start(0);
+    // now play the returned tts
     me.eventService.audioPlaying.emit();
     me.ioService.sendMessage('tts', { text });
   }
@@ -75,16 +87,6 @@ export class DialogflowComponent implements AfterViewInit {
   playOutput(arrayBuffer: ArrayBuffer) {
     let me = this;
     try {
-      me.audioContext = new AudioContext();
-      // create empty buffer to warm up
-      let b = me.audioContext.createBuffer(1, 1, 22050);
-      let tempSource = me.audioContext.createBufferSource();
-      tempSource.buffer = b;
-      // connect to output (your speakers)
-      tempSource.connect(me.audioContext.destination);
-      // play the file
-      tempSource.start(0);
-
       if (arrayBuffer.byteLength > 0) {
           me.audioContext.decodeAudioData(arrayBuffer,
           function(buffer) {

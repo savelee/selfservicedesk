@@ -237,3 +237,5 @@ Thumbs.db
 *.js
 *.map
 !client/src/assets/*.js
+!examples/*.js
+
