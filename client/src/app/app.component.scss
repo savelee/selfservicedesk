@@ -11,10 +11,16 @@ and (orientation : portrait) {
     }
   }
 
+  .helpbox,
+  .link,
   .title {
-    font-size: 14px !important;
-    margin: 0 !important;
-    padding-left: 10px !important;
+    display: none !important;
+  }
+
+  .stop_btn {
+    width: 100px !important;
+    height: 50px !important;
+    font-size: 80% !important;
   }
 
   .flex-grid-parts .col.side {

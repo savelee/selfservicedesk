@@ -6,6 +6,9 @@ and (orientation : portrait) {
     .visualizer {
         display: none;
     }
+    .utterance {
+        top: -60px !important;
+    }
 }
   
 .visualizer {
