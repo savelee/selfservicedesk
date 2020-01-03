@@ -86,11 +86,12 @@ export class MicrophoneComponent {
               // as soon as the stream is available
               ondataavailable(blob) {
                 me.ioService.sendBinaryStream(blob);
+                me.waveform.visualize();
               }
           });
           me.recordAudio.startRecording();
           // recording started
-          // me.waveform.start(stream);
+          me.waveform.start(stream);
       }).catch(function(error) {
           console.error(JSON.stringify(error));
       });
@@ -121,7 +122,7 @@ export class MicrophoneComponent {
               me.ioService.sendMessage('message', files);
           });*/
       });
-      // me.waveform.stop();
+      this.waveform.stop();
     }
 
     reset() {

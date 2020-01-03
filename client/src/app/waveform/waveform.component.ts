@@ -32,7 +32,6 @@ export class WaveformComponent implements OnInit {
     public fulfillment: Fulfillment;
     public source: MediaStreamAudioSourceNode;
     public audioCtx: AudioContext;
-    // public distortion: WaveShaperNode;
     public analyser: AnalyserNode;
     public myReq: number;
 
@@ -45,22 +44,15 @@ export class WaveformComponent implements OnInit {
     public start(stream: MediaStream) {
         this.audioCtx = new AudioContext();
         this.analyser = this.audioCtx.createAnalyser();
-        // this.distortion = this.audioCtx.createWaveShaper();
-
+        this.analyser.smoothingTimeConstant = 0;
+        this.analyser.fftSize = 2048;
         this.canvasCtx = (<HTMLCanvasElement> this.canvas.nativeElement).getContext('2d');
-
         this.source = this.audioCtx.createMediaStreamSource(stream);
         this.source.connect(this.analyser);
-        this.analyser.connect(this.audioCtx.destination);
-        // this.analyser.connect(this.distortion);
-        // this.distortion.connect(this.audioCtx.destination);
-        this.visualize();
     }
 
     public stop() {
         this.source.disconnect(this.analyser);
-        this.analyser.disconnect(this.audioCtx.destination);
-        // this.distortion.disconnect(this.audioCtx.destination);
         cancelAnimationFrame(this.myReq);
     }
 
@@ -70,7 +62,6 @@ export class WaveformComponent implements OnInit {
         let height = (<HTMLCanvasElement> me.canvas.nativeElement).height;
         let bufferLength = me.analyser.frequencyBinCount;
         let dataArray = new Uint8Array(bufferLength);
-        me.analyser.fftSize = 2048;
         me.canvasCtx.clearRect(0, 0, width, height);
 
         function draw() {

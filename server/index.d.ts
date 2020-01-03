@@ -9,6 +9,5 @@ export declare class App {
     private createServer;
     private sockets;
     private listen;
-    prepareAudioDetection(dataURL: string): void;
 }
 export declare let app: App;
