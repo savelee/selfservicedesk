@@ -27,9 +27,28 @@ import { EventService } from './services/event.service';
 export class AppComponent {
   title = 'SelfServiceDesk';
 
-  constructor(public eventService: EventService) { }
+  constructor(public eventService: EventService) {
+    this.browserCheck();
+  }
 
   onReset() {
     this.eventService.resetInterface.emit();
+  }
+
+  /**
+   * Chrome on iOS (iPhone & iPad) can't make use of WebRTC & getUserMedia()
+   * https://support.google.com/chrome/forum/AAAAP1KN0B0NrNQ8brcVvM/?hl=nl
+   */
+  browserCheck() {
+    let nav = window.navigator;
+    let ua = nav.userAgent;
+    // iPhone or iPad is in the UA string (could be Opera)
+    // There's Mac in the UA string (not Opera)
+    // and it's not Safari (because on Safari it works fine)
+    if ((ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1)
+    && ua.indexOf('Mac OS') !== -1
+    && ua.indexOf('Safari') !== 1) {
+      alert('Unfortunately, this application won\'t work in Chrome for iOS. Please open mobile Safari.');
+    }
   }
 }

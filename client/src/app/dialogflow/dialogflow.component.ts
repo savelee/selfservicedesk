@@ -75,21 +75,29 @@ export class DialogflowComponent implements AfterViewInit {
   playOutput(arrayBuffer: ArrayBuffer) {
     let me = this;
     try {
-        me.audioContext = new AudioContext();
-        console.log(this.audioContext);
-        if (arrayBuffer.byteLength > 0) {
-            me.audioContext.decodeAudioData(arrayBuffer,
-            function(buffer) {
-                me.audioContext.resume();
-                me.outputSource = me.audioContext.createBufferSource();
-                me.outputSource.connect(me.audioContext.destination);
-                me.outputSource.buffer = buffer;
-                me.outputSource.start(0);
-            },
-            function() {
-                console.log(arguments);
-            });
-        }
+      me.audioContext = new AudioContext();
+      // create empty buffer to warm up
+      let b = me.audioContext.createBuffer(1, 1, 22050);
+      let tempSource = me.audioContext.createBufferSource();
+      tempSource.buffer = b;
+      // connect to output (your speakers)
+      tempSource.connect(me.audioContext.destination);
+      // play the file
+      tempSource.start(0);
+
+      if (arrayBuffer.byteLength > 0) {
+          me.audioContext.decodeAudioData(arrayBuffer,
+          function(buffer) {
+              me.audioContext.resume();
+              me.outputSource = me.audioContext.createBufferSource();
+              me.outputSource.buffer = buffer;
+              me.outputSource.connect(me.audioContext.destination);
+              me.outputSource.start(0);
+          },
+          function() {
+              console.log(arguments);
+          });
+      }
     } catch (e) {
         console.log(e);
     }
