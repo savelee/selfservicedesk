@@ -18,6 +18,7 @@ COPY server/package*.json ./server/
 COPY server/tsconfig.json ./server/
 COPY server/index.ts ./server/
 COPY server/dialogflow.ts ./server/
+COPY server/speech.ts ./server/
 
 WORKDIR /usr/src/app/client
 RUN npm set progress=false && npm config set depth 0 && npm cache clean --force
