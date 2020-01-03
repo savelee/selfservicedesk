@@ -111,7 +111,7 @@ export class App {
                 console.log(obj);
                 speech.textToSpeech(obj.text).then(function(audio: AudioBuffer){
                     me.socketClient.emit('audio', audio);
-                }).catch(function(e) { console.log(e); })
+                }).catch(function(e: any) { console.log(e); })
             });
         });
     }
