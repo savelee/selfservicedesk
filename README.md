@@ -10,6 +10,10 @@ Airport SelfServiceDesk demo, to demonstrate how microphone streaming to GCP wor
 
 In this demo, you can start recording your voice, it will display answers on a screen.
 
+![alt text](https://github.com/savelee/savelee/I/O/docs/architecture2.png "Architecture")
+
+![alt text](https://github.com/savelee/savelee/I/O/docs/screen.png "Screenshot")
+
 # Setup Local Environment
 
 These steps will deploy a Node JS application with a Angular client, to a cluster with **Cloud Run for Anthos**.
