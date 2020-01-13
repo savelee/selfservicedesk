@@ -10,9 +10,9 @@ Airport SelfServiceDesk demo, to demonstrate how microphone streaming to GCP wor
 
 In this demo, you can start recording your voice, it will display answers on a screen.
 
-![alt text](https://github.com/savelee/selfservicedesk/I/O/docs/architecture2.png "Architecture")
+![alt text](https://github.com/savelee/selfservicedesk/blob/I/O/docs/architecture2.png "Architecture")
 
-![alt text](https://github.com/savelee/selfservicedesk/I/O/docs/screen.png "Screenshot")
+![alt text](https://github.com/savelee/selfservicedesk/blob/I/O/docs/screen.png "Screenshot")
 
 # Setup Local Environment
 
