@@ -4,6 +4,7 @@ export declare class App {
     private server;
     private io;
     socketClient: SocketIO.Server;
+    baseLang: string;
     constructor();
     private createApp;
     private createServer;

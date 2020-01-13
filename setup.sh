@@ -57,6 +57,9 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
   --role roles/dialogflow.reader
 gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member serviceAccount:$SA_EMAIL \
+  --role roles/cloudtranslate.admin
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member serviceAccount:$SA_EMAIL \
   --role roles/errorreporting.admin
 gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member serviceAccount:$SA_EMAIL \

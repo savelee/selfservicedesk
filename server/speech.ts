@@ -1,3 +1,5 @@
+import { translate } from "./translate";
+
 const speechToText = require('@google-cloud/speech');
 const textToSpeech = require('@google-cloud/text-to-speech');
 
@@ -30,7 +32,6 @@ export class Speech {
         this.ttsRequest = {
           // Select the language and SSML Voice Gender (optional)
           voice: {
-            languageCode: this.languageCode, //https://www.rfc-editor.org/rfc/bcp/bcp47.txt
             ssmlGender: this.ssmlGender  //  'MALE|FEMALE|NEUTRAL'
           },
           // Select the type of audio encoding
@@ -44,7 +45,8 @@ export class Speech {
             config: {
               sampleRateHertz: this.sampleRateHertz,
               encoding: this.encoding,
-              languageCode: this.languageCode
+              languageCode: 'nl-NL', //TODO
+              alternativeLanguageCodes: [`es-ES`, `en-US`, `fr-FR`], //TODO
             },
             //interimResults: true,
             //enableSpeakerDiarization: true,
@@ -53,35 +55,21 @@ export class Speech {
         };
     }
 
-    async speechToText(audio: AudioBuffer) {
+    async speechToText(audio: Buffer, lang: string) {
         this.sttRequest.audio = {
             content: audio
         };
         const responses = await this.stt.recognize(this.sttRequest);
-        return responses;
+        const results = responses[0].results[0].alternatives[0];
+        return {
+            'transcript' : results.transcript,
+            'detectLang': lang
+        };
     }
 
-    speechStreamToText(stream: any, cb: Function) {
-        const recognizeStream = this.stt.streamingRecognize(this.sttRequest)
-        .on('data', function(data: any){
-          console.log(data);
-          cb(data);
-        })
-        .on('error', (e: any) => {
-          console.log(e);
-        })
-        .on('end', () => {
-          console.log('on end');
-        });
-      
-        stream.pipe(recognizeStream);
-        stream.on('end', function() {
-            //fileWriter.end();
-        });
-    }
-
-    async textToSpeech(text: string) {
+    async textToSpeech(text: string, lang: string) {
         this.ttsRequest.input = { text };
+        this.ttsRequest.voice.languageCode = lang;
         const responses = await this.tts.synthesizeSpeech(this.ttsRequest);
         return responses[0].audioContent;  
     }

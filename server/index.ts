@@ -19,9 +19,9 @@
 import * as dotenv from 'dotenv';
 import { dialogflow } from './dialogflow';
 import { speech } from './speech';
+import { translate } from './translate';
 import * as socketIo from 'socket.io';
 import * as path from 'path';
-import * as fs from 'fs';
 import * as http from 'http';
 import * as express from 'express';
 import * as cors from 'cors';
@@ -38,12 +38,15 @@ export class App {
     private server: http.Server;
     private io: SocketIO.Server;
     public socketClient: SocketIO.Server;
+    public baseLang: string;
     
     constructor() {
         this.createApp();
         this.createServer();
         this.sockets();
         this.listen();
+
+        this.baseLang = process.env.LANGUAGE_CODE;
     }
 
     private createApp(): void {
@@ -87,31 +90,30 @@ export class App {
             client.emit('server_setup', `Server connected [id=${client.id}]`);
 
             // simple DF detectIntent call
-            /*client.on('message', function (results: any) {
-                let dataURL = results.audio.dataURL;
-                dataURL = dataURL.split(',').pop();
+            client.on('message', async function (results: any) {
+                // we get the dataURL which was sent from the client
+                const dataURL = results.audio.dataURL.split(',').pop();
+                // we will convert it to a Buffer
                 let fileBuffer = Buffer.from(dataURL, 'base64');
-        
-                dialogflow.detectIntent(fileBuffer, function(results: any){
-                    me.socketClient.emit('results', results);
-                });
-            });*/
+                // run the simple detectIntent() function
 
-            // DF detect stream call
-            ss(client).on('stream', function(stream: any, data: any) {
-                var filename = path.basename(data.name);
-                stream.pipe(fs.createWriteStream(filename));
-                dialogflow.detectIntentStream(stream, function(results: any){
-                    me.socketClient.emit('results', results);
+                let transribeObj = await speech.speechToText(fileBuffer, 'nl-NL'); //TODO this language setting should come from a flag
+                let detectLang = transribeObj.detectLang;
+                console.log(detectLang);
+                let translateReponse = await translate.translate(transribeObj.transcript, me.baseLang);
+                console.log(translateReponse);
+                // Match the intent
+                dialogflow.detectIntent(translateReponse.translatedText, async function(intentMatch: any){
+                    // Translate the fulfillment
+                    console.log(intentMatch);
+                    let translatedOutput = await translate.translate(intentMatch.FULFILLMENT_TEXT, detectLang);
+                    // TTS the answer
+                    speech.textToSpeech(translatedOutput.translatedText, detectLang).then(function(audio: AudioBuffer){
+                        console.log(audio);
+                        me.socketClient.emit('audio', audio);
+                    }).catch(function(e: any) { console.log(e); })
                 });
-            });
-
-            // TTS call
-            client.on('tts', function(obj: any) {
-                console.log(obj);
-                speech.textToSpeech(obj.text).then(function(audio: AudioBuffer){
-                    me.socketClient.emit('audio', audio);
-                }).catch(function(e: any) { console.log(e); })
+            
             });
         });
     }

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 export declare class Speech {
     private languageCode;
     private encoding;
@@ -9,8 +10,10 @@ export declare class Speech {
     private sttRequest;
     constructor();
     setupSpeech(): void;
-    speechToText(audio: AudioBuffer): Promise<any>;
-    speechStreamToText(stream: any, cb: Function): void;
+    speechToText(audio: Buffer): Promise<{
+        'transcript': any;
+        'detectLang': string;
+    }>;
     textToSpeech(text: string): Promise<any>;
 }
 export declare let speech: Speech;

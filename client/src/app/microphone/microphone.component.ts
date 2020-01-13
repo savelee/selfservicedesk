@@ -87,7 +87,6 @@ export class MicrophoneComponent {
 
               // as soon as the stream is available
               ondataavailable(blob) {
-                me.ioService.sendBinaryStream(blob);
                 me.waveform.visualize();
               }
           });
@@ -104,10 +103,10 @@ export class MicrophoneComponent {
       this.startDisabled = false;
 
       // stop audio recorder
-      // let me = this;
+      let me = this;
       this.recordAudio.stopRecording(function() {
           // after stopping the audio, get the audio data
-          /*me.recordAudio.getDataURL(function(audioDataURL) {
+          me.recordAudio.getDataURL(function(audioDataURL) {
               let files = {
                   audio: {
                       type: me.recordAudio.getBlob().type || 'audio/wav',
@@ -116,7 +115,7 @@ export class MicrophoneComponent {
               };
               // submit the audio file to the server
               me.ioService.sendMessage('message', files);
-          });*/
+          });
       });
       this.waveform.stop();
     }

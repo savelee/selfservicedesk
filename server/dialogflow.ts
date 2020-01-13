@@ -20,8 +20,6 @@ import * as uuid from 'uuid';
 import * as pb from 'pb-util';
 
 const util = require('util');
-const { Transform, pipeline } = require('stream');
-const pump = util.promisify(pipeline);
 const df = require('dialogflow').v2beta1;
 
 dotenv.config();
@@ -29,9 +27,6 @@ dotenv.config();
 export class Dialogflow {
   private projectId: string;
   private languageCode: string;
-  private encoding: string;
-  private sampleRateHertz: Number;
-  private singleUtterance: Boolean;
   private request: any;
   private sessionClient: any;
   private sessionPath: any;
@@ -40,9 +35,6 @@ export class Dialogflow {
   constructor() {
       this.languageCode = process.env.LANGUAGE_CODE;
       this.projectId = process.env.PROJECT_ID;
-      this.encoding = process.env.ENCODING;
-      this.singleUtterance = (process.env.SINGLE_UTTERANCE == 'true');
-      this.sampleRateHertz = parseInt(process.env.SAMPLE_RATE_HERZ);
       this.setupDialogflow();
   }
 
@@ -53,87 +45,29 @@ export class Dialogflow {
       this.sessionId = uuid.v4();
       this.sessionClient = new df.SessionsClient();
       this.sessionPath = this.sessionClient.sessionPath(this.projectId, this.sessionId);
-
-      // Create the initial request object
-      // When streaming, this is the first call you will
-      // make, a request without the audio stream
-      // which prepares Dialogflow in receiving audio
-      // with a certain sampleRateHerz, encoding and languageCode
-      // this needs to be in line with the audio settings
-      // that are set in the client
       
       this.request = {
         session: this.sessionPath,
         queryInput: {
-          audioConfig: {
-            sampleRateHertz: this.sampleRateHertz,
-            audioEncoding: this.encoding,
-            languageCode: this.languageCode,
-          },
-          singleUtterance: this.singleUtterance
-        },
-        outputAudio: {
-          outputAudioConfig: {
-            audioEncoding: `OUTPUT_AUDIO_ENCODING_LINEAR_16`
-          } 
+          text: {
+            languageCode: this.languageCode
+          }
         }
       }
   }
 
  /*
-  * Detect Intent based on Audio
+  * Detect Intent based on Text String
   * @param audio file buffer
   * @param cb Callback function to execute with results
   */
-  public async detectIntent(audio: any, cb:Function){
-    this.request.inputAudio = audio;
+  public async detectIntent(text: string, cb:Function){
+    this.request.queryInput.text.text = text;
+    console.log(this.request);
     // Recognizes the speech in the audio and detects its intent.
     const responses = await this.sessionClient.detectIntent(this.request);
     cb(this.getHandleResponses(responses));
   }
-
- /*
-  * Detect Intent based on Audio Stream
-  * @param audio stream
-  * @param cb Callback function to execute with results
-  */
-  public async detectIntentStream(audio: any, cb:Function) { 
-    const me = this;
-    const stream = this.sessionClient.streamingDetectIntent()
-      .on('data', function(data: any){
-        cb(me.getHandleResponses(data));   
-      })
-      .on('error', (e: any) => {
-        console.log(e);
-      })
-      .on('end', () => {
-         // on end
-      });
-
-    // Write request objects.
-    // Thee first message must contain StreamingDetectIntentRequest.session, 
-    // [StreamingDetectIntentRequest.query_input] plus optionally 
-    // [StreamingDetectIntentRequest.query_params]. If the client wants 
-    // to receive an audio response, it should also contain 
-    // StreamingDetectIntentRequest.output_audio_config. 
-    // The message must not contain StreamingDetectIntentRequest.input_audio.
-    stream.write(this.request);
-    // pump is a small node module that pipes streams together and 
-    // destroys all of them if one of them closes.
-    await pump(
-      audio,
-      // Format the audio stream into the request format.
-      new Transform({
-        objectMode: true,
-        transform: (obj: any, _: any, next: any) => {
-          next(null, { 
-            inputAudio: obj
-          });
-        }
-      }),
-      stream
-    );
-  };
 
   /*
   * Handle Dialogflow response objects
@@ -142,8 +76,7 @@ export class Dialogflow {
   */
   public getHandleResponses(responses: any): any {
     var json:DF_RESULT = {};
-    var result = responses.queryResult;
-    var AUDIO = responses.outputAudio;
+    var result = responses[0].queryResult;
 
     // console.log(responses);
     if (responses.recognitionResult && responses.recognitionResult.isFinal == false) {
@@ -152,37 +85,26 @@ export class Dialogflow {
       };
     } else {
 
+      console.log(result);
+
     if (result && result.intent) {
       const INTENT_NAME = result.intent.displayName;
       const PARAMETERS = JSON.stringify(pb.struct.decode(result.parameters));
-      const QUERY_TEXT = result.fulfillmentText;
+      const FULFILLMENT_TEXT = result.fulfillmentText;
+      console.log(FULFILLMENT_TEXT);
       var PAYLOAD = "";
       if(result.fulfillmentMessages[0] && result.fulfillmentMessages[0].payload){
         PAYLOAD = JSON.stringify(pb.struct.decode(result.fulfillmentMessages[0].payload));
       }
       json = {
         INTENT_NAME,
-        QUERY_TEXT,
+        FULFILLMENT_TEXT,
         PARAMETERS,
-        PAYLOAD,
-        AUDIO
+        PAYLOAD
       }
       console.log(json);
       return json;
     }
-
-    // if (AUDIO.length > 0) {
-      // The audio is not included when an intent match happend. (the fulfillment will be returned, with an empty audio buffer)
-      // then the audio comes in later.
-      // Caution: once the audio is returned, the microphone will pick up the returning audio
-      // and thus you run in an endless loop.
-      // It would work fine, if you use TTS in an detectIntent() call. - or manually stop the streaming before playing.
-
-      // json['AUDIO'] = AUDIO;
-      //return json;
-
-
-    // }
   }
     
     
@@ -190,9 +112,8 @@ export class Dialogflow {
 }
 
 declare interface DF_RESULT {
-  AUDIO?: AudioBuffer,
   INTENT_NAME?: string,
-  QUERY_TEXT?: string,
+  FULFILLMENT_TEXT?: string,
   PARAMETERS?: any,
   PAYLOAD?: any
 }
