@@ -34,3 +34,7 @@ This project follows
 * The help interface needs to be translated.
 * All the button labels will need to be translated.
 * Need more intents, such as an airport map.
+* More languages?
+    - Download the svg flag from: https://hjnilsson.github.io/country-flags/ and add it to **client/assets**
+    - Find the BCP 47 Code for the language: https://appmakers.dev/bcp-47-language-codes-list/
+    - Add the button with a BCP 47 Language Code, in **client/app/app.component.html**
