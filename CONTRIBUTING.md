@@ -26,3 +26,11 @@ information on using pull requests.
 
 This project follows
 [Google's Open Source Community Guidelines](https://opensource.google.com/conduct/).
+
+## Known Issues
+
+* Switching to Dutch language, has very fast TTS speed.
+* When switching to another language, the Question is not translated on screen.
+* The help interface needs to be translated.
+* All the button labels will need to be translated.
+* Need more intents, such as an airport map.
