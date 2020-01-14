@@ -156,9 +156,29 @@ a:hover {
   font-size: 60%;
 }
 
-.flag {
-  width: 90px;
+.flags {
+  list-style-type: none;
+  display: inline-block;
+  margin-top: 25px;
+
+  li {
+    float: left;
+    margin: 0 5px;
+  }
+
+  img {
+    height: 38px;
+  }
+
+  img.inactive {
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
+  }
+
 }
+
+
+
 
 .stop_btn {
   width: 410px;

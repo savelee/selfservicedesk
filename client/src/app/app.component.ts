@@ -18,6 +18,7 @@
 
 import { Component } from '@angular/core';
 import { EventService } from './services/event.service';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -25,14 +26,28 @@ import { EventService } from './services/event.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'SelfServiceDesk';
+  public title = 'SelfServiceDesk';
+  public isInActive: boolean;
 
   constructor(public eventService: EventService) {
+    this.isInActive = true;
     this.browserCheck();
   }
 
   onReset() {
     this.eventService.resetInterface.emit();
+  }
+
+  languageSwitch(lang: string, e: Event) {
+    let element = e.target as HTMLElement;
+    let flags = document.getElementsByClassName('flag');
+    for (let i = 0; i < flags.length; i++) {
+      flags[i].className = 'flag inactive';
+    }
+
+    element.className = 'flag active';
+
+    console.log(lang);
   }
 
   /**

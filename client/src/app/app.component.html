@@ -144,7 +144,66 @@
 
     </div>
     <div class="col langpick">
-      <img src="../assets/en-US.svg" class="flag" />
+      <span class="langselection">Selected Language: <b>American English</b></span>
+      <ul class="flags">
+        <li>
+          <a href="#" (click)="languageSwitch('en-US', $event);">
+            <img class="flag" [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/en-US.svg" alt="American English" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('en-GB', $event);">
+            <img class="flag" [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/en-GB.svg" alt="British English" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('es-ES', $event);">
+            <img [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/es-ES.svg" alt="Spanish" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('pt-PT', $event);">
+            <img [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/pt-PT.svg" alt="Portuguese" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('hi-IN', $event);">
+            <img [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/hi-IN.svg" alt="Hindi" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('zh-CN', $event);">
+            <img [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/zh-CN.svg" alt="Chinese" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('ja-JP', $event);">
+            <img [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/ja-JP.svg" alt="Japanese" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('ru-RU', $event);">
+            <img [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/ru-RU.svg" alt="Russian" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('fr-FR', $event);">
+            <img [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/fr-FR.svg" alt="French" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('de-DE', $event);">
+            <img [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/de-DE.svg" alt="German" />
+          </a>
+        </li>
+        <li>
+          <a href="#" (click)="languageSwitch('nl-NL', $event);">
+            <img [ngClass]="isInActive ? 'inactive' : 'active'" src="../assets/nl-NL.svg" alt="Dutch" />
+          </a>
+        </li>
+      </ul>
+
+
     </div>
   </div>
 </div>
