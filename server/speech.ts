@@ -67,7 +67,31 @@ export class Speech {
         };
     }
 
+    async speechStreamToText(stream: any, lang: string, cb: Function) { 
+      this.sttRequest.config.languageCode = lang;
+      const recognizeStream = this.stt.streamingRecognize(this.sttRequest)
+      .on('data', function(data: any){
+        console.log(data);
+        cb(data);
+      })
+      .on('error', (e: any) => {
+        console.log(e);
+      })
+      .on('end', () => {
+        console.log('on end');
+      });
+    
+      stream.pipe(recognizeStream);
+      stream.on('end', function() {
+          //fileWriter.end();
+      });
+    };
+
     async textToSpeech(text: string, lang: string) {
+
+        // TODO OVERRULE VOICE AND SPEECH PER LANGUAGE
+        // FOR EXAMPLE DUTCH LANGUAGE IS WAY TO FAST
+
         this.ttsRequest.input = { text };
         this.ttsRequest.voice.languageCode = lang;
         const responses = await this.tts.synthesizeSpeech(this.ttsRequest);

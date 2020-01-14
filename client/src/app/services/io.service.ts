@@ -18,6 +18,8 @@
 
 import * as io from 'socket.io-client';
 
+declare const ss: any;
+
 export class IoService {
     public socket: any;
     public socketio: any;
@@ -34,6 +36,21 @@ export class IoService {
 
     setDefaultLanguage(lang: string) {
         this.lang = lang;
+    }
+
+    sendBinaryStream(blob: any) {
+        const me = this;
+        console.log('prepare blob');
+        const stream = ss.createStream();
+        // stream directly to server
+        // it will be temp. stored locally
+        ss(me.socket).emit('stream-speech', stream, {
+            name: '_temp/stream.wav',
+            size: blob.size,
+            language: me.lang
+        });
+        // pipe the audio blob to the read stream
+        ss.createBlobReadStream(blob).pipe(stream);
     }
 
     sendMessage(eventName: string, obj: any) {

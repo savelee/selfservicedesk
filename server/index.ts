@@ -26,6 +26,7 @@ import * as http from 'http';
 import * as express from 'express';
 import * as cors from 'cors';
 import * as sourceMapSupport from 'source-map-support';
+import * as fs from 'fs';
 
 const ss = require('socket.io-stream');
 
@@ -90,39 +91,40 @@ export class App {
             client.emit('server_setup', `Server connected [id=${client.id}]`);
 
             // simple DF detectIntent call
-            client.on('message', async function (results: any) {
-                // we get the dataURL which was sent from the client
-                const dataURL = results.audio.dataURL.split(',').pop();
-                const targetLang = results.audio.language;
-                // we will convert it to a Buffer
-                let fileBuffer = Buffer.from(dataURL, 'base64');
-                // run the simple detectIntent() function
+            ss(client).on('stream-speech', async function (stream: any, data: any) {
+                // get the file name
+                const filename = path.basename(data.name);
+                // get the target language
+                const targetLang = data.language;
 
-                let transcribeObj = await speech.speechToText(fileBuffer, targetLang);
-
-                // translate the transcript if the target language is not the same 
-                // as the Dialogflow base base language.
-                let response = transcribeObj.transcript;
-                if (targetLang != me.baseLang){
-                    response = await translate.translate(transcribeObj.transcript, me.baseLang);
-                    response = response.translatedText;
-                }
-
-                // Match the intent
-                dialogflow.detectIntent(response, async function(intentMatch: any){
-                    
-                    // translate the fulfillment text if the target language is not the same
-                    // as the Dialogflow base language.
-                    let intentResponse = intentMatch.FULFILLMENT_TEXT;
+                stream.pipe(fs.createWriteStream(filename));
+                speech.speechStreamToText(stream, targetLang, async function(transcribeObj: any){
+                    console.log(transcribeObj);
+                
+                    // translate the transcript if the target language is not the same 
+                    // as the Dialogflow base base language.
+                    let response = transcribeObj.transcript;
                     if (targetLang != me.baseLang){
-                        intentResponse = await translate.translate(intentMatch.FULFILLMENT_TEXT, targetLang);
-                        intentResponse = intentResponse.translatedText;
+                        response = await translate.translate(transcribeObj.transcript, me.baseLang);
+                        response = response.translatedText;
                     }
 
-                    // TTS the answer
-                    speech.textToSpeech(intentResponse, targetLang).then(function(audio: AudioBuffer){
-                        me.socketClient.emit('audio', audio);
-                    }).catch(function(e: any) { console.log(e); })
+                    // Match the intent
+                    dialogflow.detectIntent(response, async function(intentMatch: any){
+                        
+                        // translate the fulfillment text if the target language is not the same
+                        // as the Dialogflow base language.
+                        let intentResponse = intentMatch.FULFILLMENT_TEXT;
+                        if (targetLang != me.baseLang){
+                            intentResponse = await translate.translate(intentMatch.FULFILLMENT_TEXT, targetLang);
+                            intentResponse = intentResponse.translatedText;
+                        }
+
+                        // TTS the answer
+                        speech.textToSpeech(intentResponse, targetLang).then(function(audio: AudioBuffer){
+                            me.socketClient.emit('audio', audio);
+                        }).catch(function(e: any) { console.log(e); })
+                    });
                 });
             
             });
