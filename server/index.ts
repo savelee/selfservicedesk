@@ -99,7 +99,7 @@ export class App {
 
                 stream.pipe(fs.createWriteStream(filename));
                 speech.speechStreamToText(stream, targetLang, async function(transcribeObj: any){
-                    console.log(transcribeObj);
+                    me.socketClient.emit('transcript', transcribeObj.transcript);
                 
                     // translate the transcript if the target language is not the same 
                     // as the Dialogflow base base language.
@@ -118,6 +118,12 @@ export class App {
                         if (targetLang != me.baseLang){
                             intentResponse = await translate.translate(intentMatch.FULFILLMENT_TEXT, targetLang);
                             intentResponse = intentResponse.translatedText;
+                            intentMatch.TRANSLATED_FULFILLMENT = intentResponse;
+                            console.log(intentMatch);
+                            me.socketClient.emit('results', intentMatch);
+                        } else {
+                            intentMatch.TRANSLATED_FULFILLMENT = intentMatch.FULFILLMENT_TEXT;
+                            me.socketClient.emit('results', intentMatch);
                         }
 
                         // TTS the answer

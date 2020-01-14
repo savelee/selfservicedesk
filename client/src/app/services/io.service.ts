@@ -40,7 +40,6 @@ export class IoService {
 
     sendBinaryStream(blob: any) {
         const me = this;
-        console.log('prepare blob');
         const stream = ss.createStream();
         // stream directly to server
         // it will be temp. stored locally

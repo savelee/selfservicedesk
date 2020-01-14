@@ -42,15 +42,17 @@ export class DialogflowComponent implements AfterViewInit {
     me.audioContext = new AudioContext();
     me.ioService.receiveStream('results', function(data) {
       me.fulfillmentService.setFulfillments(data);
-      if (data && data.AUDIO) {
-        me.playOutput(data.AUDIO);
-      }
     });
 
     me.ioService.receiveStream('audio', function(audio) {
       if (audio) {
         me.playOutput(audio);
       }
+    });
+    me.ioService.receiveStream('transcript', function(transcript) {
+      me.fulfillmentService.setFulfillments({
+        UTTERANCE: transcript
+      });
     });
     me.eventService.audioStopping.subscribe(() => {
       me.stopOutput();

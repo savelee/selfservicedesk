@@ -17,6 +17,7 @@ export class FulfillmentService {
         return this.fulfillment;
     }
     setFulfillments(data) {
+        console.log(data);
         if (data == null) {
             return;
         }
@@ -27,12 +28,13 @@ export class FulfillmentService {
                 let payload = JSON.parse(data.PAYLOAD);
                 this.matches.push({
                     QUESTION: payload.QUESTION,
-                    ANSWER: payload.ANSWER
+                    ANSWER: data.TRANSLATED_FULFILLMENT
+                    // ANSWER: payload.ANSWER
                 });
             } else {
                 this.matches.push({
                     QUESTION: data.INTENT_NAME,
-                    ANSWER: data.QUERY_TEXT,
+                    ANSWER: data.TRANSLATED_FULFILLMENT,
                     AUDIO: data.AUDIO
                 });
             }

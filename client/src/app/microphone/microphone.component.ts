@@ -75,7 +75,7 @@ export class MicrophoneComponent {
               // get intervals based blobs
               // value in milliseconds
               // as you might not want to make detect calls every seconds
-              timeSlice: 4000,
+              timeSlice: 5000,
 
               // only for audio track
               // audioBitsPerSecond: 128000,
@@ -87,7 +87,6 @@ export class MicrophoneComponent {
 
               // as soon as the stream is available
               ondataavailable(blob) {
-                console.log('send blob');
                 me.ioService.sendBinaryStream(blob);
                 me.waveform.visualize();
               }

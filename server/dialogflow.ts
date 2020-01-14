@@ -77,21 +77,12 @@ export class Dialogflow {
   public getHandleResponses(responses: any): any {
     var json:DF_RESULT = {};
     var result = responses[0].queryResult;
-
-    // console.log(responses);
-    if (responses.recognitionResult && responses.recognitionResult.isFinal == false) {
-      return {
-        UTTERANCE: responses.recognitionResult.transcript
-      };
-    } else {
-
-      console.log(result);
+    console.log(result);
 
     if (result && result.intent) {
       const INTENT_NAME = result.intent.displayName;
       const PARAMETERS = JSON.stringify(pb.struct.decode(result.parameters));
       const FULFILLMENT_TEXT = result.fulfillmentText;
-      console.log(FULFILLMENT_TEXT);
       var PAYLOAD = "";
       if(result.fulfillmentMessages[0] && result.fulfillmentMessages[0].payload){
         PAYLOAD = JSON.stringify(pb.struct.decode(result.fulfillmentMessages[0].payload));
@@ -106,14 +97,12 @@ export class Dialogflow {
       return json;
     }
   }
-    
-    
-  }
 }
 
 declare interface DF_RESULT {
   INTENT_NAME?: string,
   FULFILLMENT_TEXT?: string,
+  TRANSLATED_FULFILLMENT?: string,
   PARAMETERS?: any,
   PAYLOAD?: any
 }

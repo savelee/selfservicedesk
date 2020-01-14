@@ -71,8 +71,7 @@ export class Speech {
       this.sttRequest.config.languageCode = lang;
       const recognizeStream = this.stt.streamingRecognize(this.sttRequest)
       .on('data', function(data: any){
-        console.log(data);
-        cb(data);
+        cb(data.results[0].alternatives[0]);
       })
       .on('error', (e: any) => {
         console.log(e);
