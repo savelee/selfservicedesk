@@ -93,23 +93,34 @@ export class App {
             client.on('message', async function (results: any) {
                 // we get the dataURL which was sent from the client
                 const dataURL = results.audio.dataURL.split(',').pop();
+                const targetLang = results.audio.language;
                 // we will convert it to a Buffer
                 let fileBuffer = Buffer.from(dataURL, 'base64');
                 // run the simple detectIntent() function
 
-                let transribeObj = await speech.speechToText(fileBuffer, 'nl-NL'); //TODO this language setting should come from a flag
-                let detectLang = transribeObj.detectLang;
-                console.log(detectLang);
-                let translateReponse = await translate.translate(transribeObj.transcript, me.baseLang);
-                console.log(translateReponse);
+                let transcribeObj = await speech.speechToText(fileBuffer, targetLang);
+
+                // translate the transcript if the target language is not the same 
+                // as the Dialogflow base base language.
+                let response = transcribeObj.transcript;
+                if (targetLang != me.baseLang){
+                    response = await translate.translate(transcribeObj.transcript, me.baseLang);
+                    response = response.translatedText;
+                }
+
                 // Match the intent
-                dialogflow.detectIntent(translateReponse.translatedText, async function(intentMatch: any){
-                    // Translate the fulfillment
-                    console.log(intentMatch);
-                    let translatedOutput = await translate.translate(intentMatch.FULFILLMENT_TEXT, detectLang);
+                dialogflow.detectIntent(response, async function(intentMatch: any){
+                    
+                    // translate the fulfillment text if the target language is not the same
+                    // as the Dialogflow base language.
+                    let intentResponse = intentMatch.FULFILLMENT_TEXT;
+                    if (targetLang != me.baseLang){
+                        intentResponse = await translate.translate(intentMatch.FULFILLMENT_TEXT, targetLang);
+                        intentResponse = intentResponse.translatedText;
+                    }
+
                     // TTS the answer
-                    speech.textToSpeech(translatedOutput.translatedText, detectLang).then(function(audio: AudioBuffer){
-                        console.log(audio);
+                    speech.textToSpeech(intentResponse, targetLang).then(function(audio: AudioBuffer){
                         me.socketClient.emit('audio', audio);
                     }).catch(function(e: any) { console.log(e); })
                 });

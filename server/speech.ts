@@ -45,8 +45,6 @@ export class Speech {
             config: {
               sampleRateHertz: this.sampleRateHertz,
               encoding: this.encoding,
-              languageCode: 'nl-NL', //TODO
-              alternativeLanguageCodes: [`es-ES`, `en-US`, `fr-FR`], //TODO
             },
             //interimResults: true,
             //enableSpeakerDiarization: true,
@@ -56,9 +54,11 @@ export class Speech {
     }
 
     async speechToText(audio: Buffer, lang: string) {
+        this.sttRequest.config.languageCode = lang;
         this.sttRequest.audio = {
-            content: audio
+            content: audio,
         };
+
         const responses = await this.stt.recognize(this.sttRequest);
         const results = responses[0].results[0].alternatives[0];
         return {

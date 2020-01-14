@@ -18,11 +18,10 @@
 
 import * as io from 'socket.io-client';
 
-declare const ss: any;
-
 export class IoService {
     public socket: any;
     public socketio: any;
+    public lang: string;
 
     constructor() {
       this.socketio = io();
@@ -30,22 +29,15 @@ export class IoService {
           console.log('connected');
       });
       this.socket.binaryType = 'arraybuffer';
+      this.lang = 'en-US';
     }
 
-    sendBinaryStream(blob: any) {
-        const me = this;
-        const stream = ss.createStream();
-        // stream directly to server
-        // it will be temp. stored locally
-        ss(me.socket).emit('stream', stream, {
-            name: '_temp/stream.wav',
-            size: blob.size
-        });
-        // pipe the audio blob to the read stream
-        ss.createBlobReadStream(blob).pipe(stream);
+    setDefaultLanguage(lang: string) {
+        this.lang = lang;
     }
 
-    sendMessage(eventName: string, obj: object) {
+    sendMessage(eventName: string, obj: any) {
+        obj.audio.language = this.lang;
         this.socketio.emit(eventName, obj);
     }
 

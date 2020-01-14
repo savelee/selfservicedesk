@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { EventService } from './services/event.service';
-import { of } from 'rxjs';
+import { IoService } from './services/io.service';
 
 @Component({
   selector: 'app-root',
@@ -27,9 +27,10 @@ import { of } from 'rxjs';
 })
 export class AppComponent {
   public title = 'SelfServiceDesk';
+  private lang = 'en-US';
   public isInActive: boolean;
 
-  constructor(public eventService: EventService) {
+  constructor(public eventService: EventService, public ioService: IoService) {
     this.isInActive = true;
     this.browserCheck();
   }
@@ -47,7 +48,7 @@ export class AppComponent {
 
     element.className = 'flag active';
 
-    console.log(lang);
+    this.ioService.setDefaultLanguage(lang);
   }
 
   /**
