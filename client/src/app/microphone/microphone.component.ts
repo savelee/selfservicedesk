@@ -104,23 +104,8 @@ export class MicrophoneComponent {
     onStop() {
       // recording stopped
       this.startDisabled = false;
-
       // stop audio recorder
-      /*
-      let me = this;
-      this.recordAudio.stopRecording(function() {
-          // after stopping the audio, get the audio data
-          me.recordAudio.getDataURL(function(audioDataURL) {
-              let files = {
-                  audio: {
-                      type: me.recordAudio.getBlob().type || 'audio/wav',
-                      dataURL: audioDataURL
-                  }
-              };
-              // submit the audio file to the server
-              me.ioService.sendMessage('message', files);
-          });
-      });*/
+      this.recordAudio.stopRecording();
       this.waveform.stop();
     }
 

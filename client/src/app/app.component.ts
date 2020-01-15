@@ -37,17 +37,20 @@ export class AppComponent {
 
   onReset() {
     this.eventService.resetInterface.emit();
+    this.languageSwitch('en-US', null);
   }
 
   languageSwitch(lang: string, e: Event) {
-    let element = e.target as HTMLElement;
     let flags = document.getElementsByClassName('flag');
     for (let i = 0; i < flags.length; i++) {
       flags[i].className = 'flag inactive';
     }
-
-    element.className = 'flag active';
-
+    if(e === null) {
+      flags[0].className = 'flag active';
+    } else {
+      let element = e.target as HTMLElement;
+      element.className = 'flag active';
+    }
     this.ioService.setDefaultLanguage(lang);
   }
 

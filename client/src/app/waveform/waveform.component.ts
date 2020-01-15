@@ -52,10 +52,21 @@ export class WaveformComponent implements OnInit {
     }
 
     public stop() {
-        if (this.audioCtx.state === 'running') {
-            this.audioCtx.suspend();
-            this.source.disconnect(this.analyser);
+        let me = this;
+        let width = (<HTMLCanvasElement> me.canvas.nativeElement).width;
+        let height = (<HTMLCanvasElement> me.canvas.nativeElement).height;
+        if (me.audioCtx.state === 'running') {
+            me.audioCtx.suspend();
+            me.source.disconnect(this.analyser);
             cancelAnimationFrame(this.myReq);
+
+            me.canvasCtx.fillStyle = '#1a1a1a';
+            me.canvasCtx.fillRect(0, 0, width, height);
+            me.canvasCtx.lineWidth = 4;
+            me.canvasCtx.strokeStyle = 'rgb(256, 256, 256)';
+            me.canvasCtx.beginPath();
+            me.canvasCtx.lineTo(width, height / 2);
+            me.canvasCtx.stroke();
         }
     }
 

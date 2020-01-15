@@ -74,8 +74,12 @@ and (orientation : portrait) {
 
 .inner {
   flex: 1;
-  overflow: auto; 
   display: flex;
+}
+
+.content {
+  overflow: auto;
+  height: 650px;
 }
 
 .flex-grid-parts { 
@@ -167,7 +171,7 @@ a:hover {
   }
 
   img {
-    height: 38px;
+    height: 30px;
   }
 
   img.inactive {
@@ -176,9 +180,6 @@ a:hover {
   }
 
 }
-
-
-
 
 .stop_btn {
   width: 410px;

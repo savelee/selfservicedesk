@@ -6,7 +6,7 @@ export class FulfillmentService {
     private defaultMessage: string;
 
     constructor() {
-        this.defaultMessage = 'Press ask a question button';
+        this.defaultMessage = 'Press \'ask a question\' button';
         this.matches = [];
         this.fulfillment = {
             UTTERANCE: this.defaultMessage,
@@ -17,7 +17,7 @@ export class FulfillmentService {
         return this.fulfillment;
     }
     setFulfillments(data) {
-        console.log(data);
+        //console.log(data);
         if (data == null) {
             return;
         }
