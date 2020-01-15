@@ -1,7 +1,7 @@
 
 
-const speechToText = require('@google-cloud/speech');
-const textToSpeech = require('@google-cloud/text-to-speech');
+const speechToText = require('@google-cloud/speech').v1p1beta1;
+const textToSpeech = require('@google-cloud/text-to-speech').v1beta1;
 
 interface LooseObject {
     [key: string]: any
@@ -45,11 +45,18 @@ export class Speech {
             config: {
               sampleRateHertz: this.sampleRateHertz,
               encoding: this.encoding,
-            },
-            //interimResults: true,
-            //enableSpeakerDiarization: true,
-            //diarizationSpeakerCount: 2,
-            //model: `phone_call`
+              enableAutomaticPunctuation: true,
+              //nableSpeakerDiarization: true,
+              //diarizationSpeakerCount: 2,
+              useEnhanced: true,
+              model: 'default',
+              metadata: {
+                microphoneDistance: 'NEARFIELD', //MIDFIELD
+                interactionType: 'VOICE_SEARCH',
+                audioTopic: 'Airport FAQ'
+              }
+            }
+
         };
     }
 

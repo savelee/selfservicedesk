@@ -87,8 +87,10 @@ export class MicrophoneComponent {
 
               // as soon as the stream is available
               ondataavailable(blob) {
-                me.ioService.sendBinaryStream(blob);
-                me.waveform.visualize();
+                if(!me.eventService.getIsPlaying()) {
+                  me.ioService.sendBinaryStream(blob);
+                  me.waveform.visualize();
+                }
               }
           });
           me.recordAudio.startRecording();

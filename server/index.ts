@@ -99,6 +99,11 @@ export class App {
 
                 stream.pipe(fs.createWriteStream(filename));
                 speech.speechStreamToText(stream, targetLang, async function(transcribeObj: any){
+         
+                    // console.log(transcribeObj.words[0].speakerTag);
+                    // don't want to transcribe the tts output
+                    // if(transcribeObj.words[0].speakerTag > 1) return;
+
                     me.socketClient.emit('transcript', transcribeObj.transcript);
                 
                     // translate the transcript if the target language is not the same 
@@ -119,7 +124,7 @@ export class App {
                             intentResponse = await translate.translate(intentMatch.FULFILLMENT_TEXT, targetLang);
                             intentResponse = intentResponse.translatedText;
                             intentMatch.TRANSLATED_FULFILLMENT = intentResponse;
-                            console.log(intentMatch);
+                            //console.log(intentMatch);
                             me.socketClient.emit('results', intentMatch);
                         } else {
                             intentMatch.TRANSLATED_FULFILLMENT = intentMatch.FULFILLMENT_TEXT;

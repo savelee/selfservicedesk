@@ -63,7 +63,6 @@ export class Dialogflow {
   */
   public async detectIntent(text: string, cb:Function){
     this.request.queryInput.text.text = text;
-    console.log(this.request);
     // Recognizes the speech in the audio and detects its intent.
     const responses = await this.sessionClient.detectIntent(this.request);
     cb(this.getHandleResponses(responses));
@@ -77,7 +76,6 @@ export class Dialogflow {
   public getHandleResponses(responses: any): any {
     var json:DF_RESULT = {};
     var result = responses[0].queryResult;
-    console.log(result);
 
     if (result && result.intent) {
       const INTENT_NAME = result.intent.displayName;
@@ -93,7 +91,7 @@ export class Dialogflow {
         PARAMETERS,
         PAYLOAD
       }
-      console.log(json);
+      //console.log(json);
       return json;
     }
   }

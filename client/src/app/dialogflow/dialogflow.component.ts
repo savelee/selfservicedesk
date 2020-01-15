@@ -16,7 +16,7 @@
  * =============================================================================
  */
 
-import { Component, AfterViewInit, EventEmitter, Output } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { FulfillmentService } from '../services/fulfillment.service';
 import { IoService } from '../services/io.service';
 import { Fulfillment } from '../models/fulfillment.model';
@@ -41,6 +41,7 @@ export class DialogflowComponent implements AfterViewInit {
     let me = this;
     me.audioContext = new AudioContext();
     me.ioService.receiveStream('results', function(data) {
+      me.eventService.setIsPlaying(false);
       me.fulfillmentService.setFulfillments(data);
     });
 
@@ -88,6 +89,7 @@ export class DialogflowComponent implements AfterViewInit {
    */
   playOutput(arrayBuffer: ArrayBuffer) {
     let me = this;
+    me.eventService.setIsPlaying(true);
     try {
       if (arrayBuffer.byteLength > 0) {
           me.audioContext.decodeAudioData(arrayBuffer,
@@ -97,6 +99,12 @@ export class DialogflowComponent implements AfterViewInit {
               me.outputSource.buffer = buffer;
               me.outputSource.connect(me.audioContext.destination);
               me.outputSource.start(0);
+              me.outputSource.onended = function() {
+                // we need the timeout, because of the timeslice in mic.
+                setTimeout(function(){ 
+                  me.eventService.setIsPlaying(false);
+                }, 5000);
+              }
           },
           function() {
               console.log(arguments);
