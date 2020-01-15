@@ -1,4 +1,4 @@
-import { translate } from "./translate";
+
 
 const speechToText = require('@google-cloud/speech');
 const textToSpeech = require('@google-cloud/text-to-speech');
@@ -87,15 +87,29 @@ export class Speech {
     };
 
     async textToSpeech(text: string, lang: string) {
-
-        // TODO OVERRULE VOICE AND SPEECH PER LANGUAGE
-        // FOR EXAMPLE DUTCH LANGUAGE IS WAY TO FAST
-
         this.ttsRequest.input = { text };
         this.ttsRequest.voice.languageCode = lang;
+        this.setSpeechTweaks(lang);
         const responses = await this.tts.synthesizeSpeech(this.ttsRequest);
         return responses[0].audioContent;  
     }
+
+
+    /*
+     * The default synthesize settings, are not optimal for every language.
+     * In certain languages, we tend to speak faster, or the pitch just sounds
+     * a bit off.
+     */
+    setSpeechTweaks(lang: string){
+      if(lang == 'nl-NL'){
+        this.ttsRequest.audioConfig.pitch = -6;
+        this.ttsRequest.audioConfig.speakingRate = 0.95;
+      } else {
+        this.ttsRequest.audioConfig.pitch = 0;
+        this.ttsRequest.audioConfig.speakingRate = 1;      
+      }
+    }
+
 
 }
 

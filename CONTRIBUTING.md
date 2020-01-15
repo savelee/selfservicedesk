@@ -29,7 +29,10 @@ This project follows
 
 ## Known Issues
 
-* Switching to Dutch language, has very fast TTS speed.
+* Test each spoken language
+* Convert FAQ to intents, to tweak the translations
+* light matches is translated to "wedstrijden" - competitions.
+  * Work with Glosseries https://cloud.google.com/translate/docs/advanced/glossary
 * When switching to another language, the Question is not translated on screen.
 * The help interface needs to be translated.
 * All the button labels will need to be translated.
