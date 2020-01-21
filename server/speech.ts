@@ -8,7 +8,6 @@ interface LooseObject {
 }
 
 export class Speech {
-    private languageCode: string;
     private encoding: string;
     private sampleRateHertz: Number;
     private ssmlGender: string;
@@ -18,7 +17,6 @@ export class Speech {
     private sttRequest: LooseObject;
       
     constructor() {
-        this.languageCode = process.env.LANGUAGE_CODE;
         this.encoding = process.env.SPEECH_ENCODING;
         this.sampleRateHertz = parseInt(process.env.SAMPLE_RATE_HERZ);
         this.ssmlGender = process.env.SSML_GENDER;

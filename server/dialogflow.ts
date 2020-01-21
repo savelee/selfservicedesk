@@ -19,7 +19,6 @@ import * as dotenv from 'dotenv';
 import * as uuid from 'uuid';
 import * as pb from 'pb-util';
 
-const util = require('util');
 const df = require('dialogflow').v2beta1;
 
 dotenv.config();

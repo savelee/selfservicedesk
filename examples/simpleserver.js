@@ -48,7 +48,6 @@ const express = require('express');
 const ss = require('socket.io-stream');
 // load all the libraries for the Dialogflow part
 const uuid = require('uuid');
-const pb = require('pb-util');
 const util = require('util');
 const { Transform, pipeline } = require('stream');
 const pump = util.promisify(pipeline);
