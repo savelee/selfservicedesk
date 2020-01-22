@@ -88,30 +88,26 @@ function setupServer() {
 
         // when the client sends 'message' events
         // when using simple audio input
-        client.on('message', function (data) {
+        client.on('message', async function(data) {
             // we get the dataURL which was sent from the client
             const dataURL = data.audio.dataURL.split(',').pop();
             // we will convert it to a Buffer
             let fileBuffer = Buffer.from(dataURL, 'base64');
             // run the simple detectIntent() function
-            detectIntent(fileBuffer, function(results){
-                console.log(results);
-                client.emit('results', results);
-            });
+            const results = await detectIntent(fileBuffer);
+            client.emit('results', results);
         });
 
         // when the client sends 'message' events
         // when using simple audio input
-          client.on('message-transcribe', function (data) {
+          client.on('message-transcribe', async function(data) {
             // we get the dataURL which was sent from the client
             const dataURL = data.audio.dataURL.split(',').pop();
             // we will convert it to a Buffer
             let fileBuffer = Buffer.from(dataURL, 'base64');
             // run the simple transcribeAudio() function
-            transcribeAudio(fileBuffer, function(results){
-                console.log(results);
-                client.emit('results', results);
-            });
+            const results = await transcribeAudio(fileBuffer);
+            client.emit('results', results);
         });
 
         // when the client sends 'stream' events
@@ -241,14 +237,11 @@ function setupTTS(){
   * @param audio file buffer
   * @param cb Callback function to execute with results
   */
- async function detectIntent(audio, cb){
+ async function detectIntent(audio){
     request.inputAudio = audio;
     console.log(request);
-    // Recognizes the speech in the audio and detects its intent.
-    // detectIntent() is a Dialogflow call
     const responses = await sessionClient.detectIntent(request);
-    // execute the callback, but first structure the responses
-    cb(responses);
+    return responses;
  }
 
  /*
@@ -308,18 +301,14 @@ function setupTTS(){
  /*
   * STT - Transcribe Speech
   * @param audio file buffer
-  * @param cb Callback function to execute with results
   */
- async function transcribeAudio(audio, cb){
+ async function transcribeAudio(audio){
   requestSTT.audio = {
     content: audio
   };
   console.log(requestSTT);
-  // Recognizes the speech in the audio and detects its intent.
-  // detectIntent() is a Dialogflow call
   const responses = await speechClient.recognize(requestSTT);
-  // execute the callback, but first structure the responses
-  cb(responses);
+  return responses;
 }
 
  /*

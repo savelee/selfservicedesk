@@ -60,11 +60,10 @@ export class Dialogflow {
   * @param audio file buffer
   * @param cb Callback function to execute with results
   */
-  public async detectIntent(text: string, cb:Function){
+  public async detectIntent(text: string){
     this.request.queryInput.text.text = text;
-    // Recognizes the speech in the audio and detects its intent.
     const responses = await this.sessionClient.detectIntent(this.request);
-    cb(this.getHandleResponses(responses));
+    return this.getHandleResponses(responses);
   }
 
   /*

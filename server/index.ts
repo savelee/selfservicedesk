@@ -115,27 +115,27 @@ export class App {
                     }
 
                     // Match the intent
-                    dialogflow.detectIntent(response, async function(intentMatch: any){
+                    const intentMatch = await dialogflow.detectIntent(response);
                         
-                        // translate the fulfillment text if the target language is not the same
-                        // as the Dialogflow base language.
-                        let intentResponse = intentMatch.FULFILLMENT_TEXT;
-                        if (targetLang != me.baseLang){
-                            intentResponse = await translate.translate(intentMatch.FULFILLMENT_TEXT, targetLang);
-                            intentResponse = intentResponse.translatedText;
-                            intentMatch.TRANSLATED_FULFILLMENT = intentResponse;
-                            //console.log(intentMatch);
-                            me.socketClient.emit('results', intentMatch);
-                        } else {
-                            intentMatch.TRANSLATED_FULFILLMENT = intentMatch.FULFILLMENT_TEXT;
-                            me.socketClient.emit('results', intentMatch);
-                        }
+                    // translate the fulfillment text if the target language is not the same
+                    // as the Dialogflow base language.
+                    let intentResponse = intentMatch.FULFILLMENT_TEXT;
+                    if (targetLang != me.baseLang){
+                        intentResponse = await translate.translate(intentMatch.FULFILLMENT_TEXT, targetLang);
+                        intentResponse = intentResponse.translatedText;
+                        intentMatch.TRANSLATED_FULFILLMENT = intentResponse;
+                        //console.log(intentMatch);
+                        me.socketClient.emit('results', intentMatch);
+                    } else {
+                        intentMatch.TRANSLATED_FULFILLMENT = intentMatch.FULFILLMENT_TEXT;
+                        me.socketClient.emit('results', intentMatch);
+                    }
 
-                        // TTS the answer
-                        speech.textToSpeech(intentResponse, targetLang).then(function(audio: AudioBuffer){
-                            me.socketClient.emit('audio', audio);
-                        }).catch(function(e: any) { console.log(e); })
-                    });
+                    // TTS the answer
+                    speech.textToSpeech(intentResponse, targetLang).then(function(audio: AudioBuffer){
+                        me.socketClient.emit('audio', audio);
+                    }).catch(function(e: any) { console.log(e); })
+                
                 });
             
             });
