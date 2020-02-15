@@ -62,8 +62,12 @@ export class App {
                 // request was via https, so do no special handling
                 next();
             } else {
-                    // request was via http, so redirect to https
-                    res.redirect('https://' + req.headers.host + req.url);
+                    if(req.headers.host != 'localhost:' + App.PORT){
+                        // request was via http, so redirect to https
+                        res.redirect('https://' + req.headers.host + req.url);
+                    } else {
+                        next();
+                    }
             }
 
         });

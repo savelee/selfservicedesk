@@ -1,6 +1,6 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# Google Cloud / Dialogflow - Self Service Desk Demo
+# Google Cloud / Dialogflow - Self Service Kiosk Demo
 
 **By Lee Boonstra, Developer Advocate @ Google Cloud.**
 
@@ -10,9 +10,9 @@ Airport SelfServiceDesk demo, to demonstrate how microphone streaming to GCP wor
 
 In this demo, you can start recording your voice, it will display answers on a screen.
 
-![alt text](https://github.com/savelee/selfservicedesk/blob/I/O/docs/architecture2.png "Architecture")
+![alt text](https://github.com/dialogflow/selfservicekiosk-audio-streaming/master/docs/architecture2.png "Architecture")
 
-![alt text](https://github.com/savelee/selfservicedesk/blob/I/O/docs/screen.png "Screenshot")
+![alt text](https://github.com/dialogflow/selfservicekiosk-audio-streaming/master/docs/screen.png "Screenshot")
 
 # Setup Local Environment
 
